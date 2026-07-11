@@ -18,9 +18,19 @@ const externalTarget = (link) => {
   return /^https?:\/\//.test(link) ? { target: "_blank", rel: "noreferrer" } : {};
 };
 
+const siteRootUrl = new URL("../../", document.currentScript.src);
+
+const resolveLocalUrl = (href) => {
+  if (window.location.protocol !== "file:" || !href || !href.startsWith("/")) return href;
+  const cleanPath = href.split("#")[0].split("?")[0];
+  const suffix = cleanPath === "/" ? "index.html" : `${cleanPath.replace(/^\/+/, "")}${cleanPath.endsWith("/") ? "index.html" : ""}`;
+  const hash = href.includes("#") ? `#${href.split("#").slice(1).join("#")}` : "";
+  return new URL(suffix, siteRootUrl).href + hash;
+};
+
 const setLinkTarget = (anchor, href) => {
   if (!anchor) return;
-  anchor.href = href || "#";
+  anchor.href = resolveLocalUrl(href || "#");
   const target = externalTarget(anchor.getAttribute("href"));
   Object.entries(target).forEach(([key, value]) => anchor.setAttribute(key, value));
 };
@@ -29,6 +39,7 @@ const renderProjects = (category = "All") => {
   const container = $("[data-projects]");
   if (!container) return;
   const limit = Number(container.dataset.projectLimit || 0);
+  const isCompact = container.classList.contains("compact-creations");
   const projects = siteData.projects.filter(
     (project) => category === "All" || project.category === category,
   ).slice(0, limit || undefined);
@@ -36,20 +47,55 @@ const renderProjects = (category = "All") => {
 
   projects.forEach((project) => {
     const card = createElement("article", "project-card");
-    const image = createElement("img");
-    image.src = project.image;
-    image.alt = `${project.title} preview`;
-    image.loading = "lazy";
+    if (project.status) card.dataset.status = project.status;
+
+    if (project.image) {
+      const image = createElement("img");
+      image.src = project.image;
+      image.alt = `${project.title} preview`;
+      image.loading = "lazy";
+      card.append(image);
+    } else {
+      const teaser = createElement("div", "project-teaser");
+      teaser.innerHTML = "<span>Coming Soon</span>";
+      card.append(teaser);
+    }
 
     const body = createElement("div", "card-body");
     const meta = createElement("p", "card-meta", `${project.category} | ${project.year}`);
     const title = createElement("h3", "", project.title);
     const description = createElement("p", "", project.description);
-    const link = createElement("a", "text-link", "View project");
-    setLinkTarget(link, project.link);
+    const progress = project.progress
+      ? createElement(
+          "div",
+          "progress-block compact-progress",
+          "",
+        )
+      : null;
+    if (progress) {
+      const label = createElement(
+        "span",
+        "progress-label",
+        isCompact ? `${project.progress}% Complete` : `Progress: ${project.progress}%`,
+      );
+      const track = createElement("span", "progress-track");
+      const fill = createElement("span", "progress-fill");
+      fill.style.setProperty("--progress", `${project.progress}%`);
+      track.append(fill);
+      progress.append(label, track);
+    }
+    const link = createElement("a", "text-link", project.status ? "Coming soon" : "View project");
+    if (project.status) {
+      link.href = "#";
+      link.setAttribute("aria-disabled", "true");
+    } else {
+      setLinkTarget(link, project.link);
+    }
 
-    body.append(meta, title, description, link);
-    card.append(image, body);
+    body.append(meta, title, description);
+    if (progress) body.append(progress);
+    body.append(link);
+    card.append(body);
     container.append(card);
   });
 };
@@ -118,6 +164,44 @@ const renderVideos = () => {
   });
 };
 
+const renderPlaylists = () => {
+  const container = $("[data-playlists]");
+  if (!container) return;
+  const playlists = siteData.playlists || [];
+  container.innerHTML = "";
+
+  if (!playlists.length) {
+    const empty = createElement("p", "playlist-empty", "Playlist links coming soon.");
+    container.append(empty);
+    return;
+  }
+
+  playlists.forEach((playlist) => {
+    const card = createElement("article", "playlist-card");
+    const thumbLink = createElement("a", "playlist-thumb");
+    setLinkTarget(thumbLink, playlist.url);
+    thumbLink.setAttribute("aria-label", `View ${playlist.title} playlist`);
+
+    const image = createElement("img");
+    image.src = playlist.thumbnail;
+    image.alt = `${playlist.title} playlist thumbnail`;
+    image.loading = "lazy";
+    const play = createElement("span", "playlist-play");
+    play.setAttribute("aria-hidden", "true");
+    thumbLink.append(image, play);
+
+    const body = createElement("div", "playlist-body");
+    const title = createElement("h3", "", playlist.title);
+    const description = createElement("p", "", playlist.description);
+    const action = createElement("a", "button secondary", "View Playlist");
+    setLinkTarget(action, playlist.url);
+    body.append(title, description, action);
+
+    card.append(thumbLink, body);
+    container.append(card);
+  });
+};
+
 const renderUpdates = () => {
   const container = $("[data-updates]");
   if (!container) return;
@@ -173,6 +257,13 @@ const renderSocialLinks = () => {
   });
 };
 
+const rewriteStaticInternalLinks = () => {
+  if (window.location.protocol !== "file:") return;
+  $$("a[href^='/']").forEach((link) => {
+    link.href = resolveLocalUrl(link.getAttribute("href"));
+  });
+};
+
 const hydrateSite = () => {
   if (document.title === "Mr. Monkey") {
     document.title = siteData.name;
@@ -196,6 +287,7 @@ const hydrateSite = () => {
   renderFilters();
   renderProjects();
   renderVideos();
+  renderPlaylists();
   renderUpdates();
   renderSkills();
   renderContactLinks();
@@ -221,16 +313,33 @@ const setupNavigation = () => {
 };
 
 const markActivePage = () => {
-  const currentPage = window.location.pathname.split("/").pop() || "index.html";
-  const isCreationDetail = window.location.pathname.includes("/pages/creations/");
+  const cleanFilePath = (urlValue) => {
+    const url = new URL(urlValue, window.location.href);
+    if (url.protocol !== "file:") return url.pathname;
+    const rootPath = siteRootUrl.pathname.replace(/\/$/, "");
+    const path = url.pathname;
+    const relative = path.startsWith(rootPath) ? path.slice(rootPath.length) : path;
+    return relative.replace(/index\.html$/, "") || "/";
+  };
+  const normalizePath = (path) => {
+    if (!path || path === "/index.html") return "/";
+    return path.endsWith("/") ? path : `${path}/`;
+  };
+  const currentPath = normalizePath(
+    window.location.protocol === "file:" ? cleanFilePath(window.location.href) : window.location.pathname,
+  );
+  const isCreationDetail = currentPath.startsWith("/creations/") && currentPath !== "/creations/";
   $$(".site-nav a").forEach((link) => {
-    const linkPage = link.getAttribute("href");
-    if (linkPage === currentPage || (isCreationDetail && linkPage.includes("creations.html"))) {
+    const linkPath = normalizePath(
+      window.location.protocol === "file:" ? cleanFilePath(link.href) : link.getAttribute("href"),
+    );
+    if (linkPath === currentPath || (isCreationDetail && linkPath === "/creations/")) {
       link.setAttribute("aria-current", "page");
     }
   });
 };
 
 hydrateSite();
+rewriteStaticInternalLinks();
 setupNavigation();
 markActivePage();
