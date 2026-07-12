@@ -1608,6 +1608,23 @@ time {
   color: var(--gold);
 }
 
+.form-thank-you {
+  padding: clamp(10px, 2vw, 18px);
+}
+
+.form-thank-you h2 {
+  margin-bottom: 10px;
+  font-size: clamp(2rem, 4vw, 2.7rem);
+}
+
+.form-thank-you p:last-child {
+  margin-bottom: 0;
+}
+
+.form-thank-you:focus {
+  outline: none;
+}
+
 .form-note {
   margin: 0;
   color: rgba(255, 253, 248, 0.66);

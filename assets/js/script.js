@@ -401,6 +401,8 @@ const setupContactForm = () => {
   if (!form) return;
 
   const status = form.querySelector("[data-contact-status]");
+  const submit = form.querySelector("[data-contact-submit]");
+  const defaultSubmitText = submit ? submit.textContent : "";
   const draftKey = "mr-monkey-contact-draft";
   const draftFields = ["name", "email", "topic", "message"];
   let messageSent = false;
@@ -410,6 +412,42 @@ const setupContactForm = () => {
     if (!status) return;
     status.textContent = message;
     status.dataset.type = type;
+  };
+
+  const readResponseMessage = async (response) => {
+    const fallback = `Formspree returned error ${response.status}. Please try again.`;
+    const contentType = response.headers.get("content-type") || "";
+
+    try {
+      if (contentType.includes("application/json")) {
+        const data = await response.json();
+        if (Array.isArray(data.errors) && data.errors.length) {
+          return data.errors
+            .map((error) => error.message || error.code || error.field)
+            .filter(Boolean)
+            .join(" ");
+        }
+        return data.error || data.message || fallback;
+      }
+
+      const text = await response.text();
+      if (!text) return fallback;
+      return text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 220) || fallback;
+    } catch (error) {
+      return fallback;
+    }
+  };
+
+  const showThankYou = () => {
+    form.innerHTML = `
+      <div class="form-thank-you" tabindex="-1">
+        <p class="eyebrow">Message Sent</p>
+        <h2>Thanks for reaching out.</h2>
+        <p>Your message was sent to Mr. Monkey. I will check it soon.</p>
+      </div>
+    `;
+    const message = form.querySelector(".form-thank-you");
+    if (message) message.focus();
   };
 
   const readDraft = () => {
@@ -498,17 +536,62 @@ const setupContactForm = () => {
     event.returnValue = "";
   });
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!form.reportValidity()) {
+      setStatus("Please fill out the required fields before sending.", "error");
+      return;
+    }
+
     const captchaResponse = form.querySelector("[name='g-recaptcha-response']");
     const hasCaptcha = captchaComplete || (captchaResponse && captchaResponse.value);
     if (!hasCaptcha) {
-      event.preventDefault();
       setStatus("Please complete the reCAPTCHA checkbox before sending.", "error");
       return;
     }
 
-    messageSent = true;
-    clearDraft();
+    if (submit) {
+      submit.disabled = true;
+      submit.textContent = "Sending...";
+    }
+    setStatus("Sending your message...", "pending");
+
+    try {
+      const formData = new FormData(form);
+      const email = form.elements.email ? form.elements.email.value : "";
+      if (email && !formData.has("_replyto")) {
+        formData.append("_replyto", email);
+      }
+
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (response.ok) {
+        messageSent = true;
+        clearDraft();
+        showThankYou();
+        return;
+      }
+
+      setStatus(await readResponseMessage(response), "error");
+      if (window.grecaptcha) {
+        window.grecaptcha.reset();
+        captchaComplete = false;
+      }
+    } catch (error) {
+      setStatus("Message could not be sent right now. Please try again in a moment.", "error");
+    } finally {
+      if (submit && !messageSent) {
+        submit.disabled = false;
+        submit.textContent = defaultSubmitText;
+      }
+    }
   });
 };
 
