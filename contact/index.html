@@ -60,7 +60,7 @@
           </p>
           <div class="contact-links" data-contact-links></div>
         </div>
-        <form class="contact-form" action="https://formspree.io/f/meeyjvor" method="POST" data-contact-form>
+        <form class="contact-form" data-contact-form data-contact-endpoint="https://formspree.io/f/meeyjvor">
           <input type="hidden" name="_subject" value="New message from Mr. Monkey website" />
           <input class="form-honeypot" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
           <div class="form-row">
@@ -95,7 +95,7 @@
               data-expired-callback="contactCaptchaExpired"
             ></div>
           </div>
-          <button class="button primary" type="submit" data-contact-submit>Send Message</button>
+          <button class="button primary" type="button" data-contact-submit>Send Message</button>
           <p class="form-status" data-contact-status aria-live="polite"></p>
           <p class="form-note">This sends your message through Formspree.</p>
         </form>

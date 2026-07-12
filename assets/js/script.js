@@ -400,6 +400,7 @@ const setupContactForm = () => {
   const form = $("[data-contact-form]");
   if (!form) return;
 
+  const endpoint = form.dataset.contactEndpoint;
   const status = form.querySelector("[data-contact-status]");
   const submit = form.querySelector("[data-contact-submit]");
   const defaultSubmitText = submit ? submit.textContent : "";
@@ -536,8 +537,11 @@ const setupContactForm = () => {
     event.returnValue = "";
   });
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  const sendForm = async () => {
+    if (!endpoint) {
+      setStatus("The contact form endpoint is missing.", "error");
+      return;
+    }
 
     if (!form.reportValidity()) {
       setStatus("Please fill out the required fields before sending.", "error");
@@ -564,7 +568,7 @@ const setupContactForm = () => {
         formData.append("_replyto", email);
       }
 
-      const response = await fetch(form.action, {
+      const response = await fetch(endpoint, {
         method: "POST",
         body: formData,
         headers: {
@@ -592,7 +596,16 @@ const setupContactForm = () => {
         submit.textContent = defaultSubmitText;
       }
     }
+  };
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    sendForm();
   });
+
+  if (submit) {
+    submit.addEventListener("click", sendForm);
+  }
 };
 
 const rewriteStaticInternalLinks = () => {
