@@ -35,6 +35,138 @@ const setLinkTarget = (anchor, href) => {
   Object.entries(target).forEach(([key, value]) => anchor.setAttribute(key, value));
 };
 
+const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const navTransitionKey = "mr-monkey-page-transition";
+let pageTransitionActive = false;
+
+const readTransitionMarker = () => {
+  try {
+    const value = sessionStorage.getItem(navTransitionKey);
+    sessionStorage.removeItem(navTransitionKey);
+    return value;
+  } catch (error) {
+    return "";
+  }
+};
+
+const writeTransitionMarker = () => {
+  try {
+    sessionStorage.setItem(navTransitionKey, String(Date.now()));
+  } catch (error) {
+    return false;
+  }
+  return true;
+};
+
+const currentNavigationType = () => {
+  const navigation = performance.getEntriesByType("navigation")[0];
+  return navigation ? navigation.type : "";
+};
+
+const isSamePageAnchor = (url) => (
+  url.pathname === window.location.pathname
+  && url.search === window.location.search
+  && url.hash
+);
+
+const isEligibleInternalLink = (link, event) => {
+  if (!link || event.defaultPrevented || event.button !== 0) return false;
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return false;
+  if (link.hasAttribute("download")) return false;
+  if (link.getAttribute("aria-disabled") === "true") return false;
+  if (link.classList.contains("disabled-button")) return false;
+
+  const rawHref = link.getAttribute("href");
+  if (!rawHref || rawHref.startsWith("#")) return false;
+  if (/^(mailto|tel|javascript):/i.test(rawHref)) return false;
+
+  const target = (link.getAttribute("target") || "").toLowerCase();
+  if (target && target !== "_self") return false;
+
+  let url;
+  try {
+    url = new URL(link.href, window.location.href);
+  } catch (error) {
+    return false;
+  }
+
+  if (url.protocol !== window.location.protocol) return false;
+  if (window.location.protocol === "file:") {
+    if (!url.pathname.startsWith(siteRootUrl.pathname.replace(/\/$/, ""))) return false;
+  } else if (url.origin !== window.location.origin) {
+    return false;
+  }
+
+  if (isSamePageAnchor(url)) return false;
+  if (url.href === window.location.href) return false;
+  return true;
+};
+
+const applyArrivalTransition = () => {
+  const stored = readTransitionMarker();
+
+  if (prefersReducedMotion()) return;
+
+  const type = currentNavigationType();
+  const now = Date.now();
+  const internalClick = stored && now - Number(stored) < 5000;
+  const className = internalClick ? "page-enter" : type === "back_forward" ? "nav-pop" : "";
+  if (!className) return;
+
+  document.body.classList.add(className);
+  window.setTimeout(() => document.body.classList.remove(className), internalClick ? 520 : 220);
+};
+
+const setupPageTransitions = () => {
+  applyArrivalTransition();
+
+  window.addEventListener("pageshow", (event) => {
+    document.body.classList.remove("is-leaving");
+    pageTransitionActive = false;
+    if (event.persisted && !prefersReducedMotion()) {
+      document.body.classList.add("nav-pop");
+      window.setTimeout(() => document.body.classList.remove("nav-pop"), 220);
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) return;
+    const link = event.target.closest("a[href]");
+    if (!isEligibleInternalLink(link, event)) return;
+
+    event.preventDefault();
+    if (pageTransitionActive) return;
+    pageTransitionActive = true;
+
+    const destination = link.href;
+    writeTransitionMarker();
+
+    const navigate = () => {
+      window.location.assign(destination);
+      window.setTimeout(() => {
+        document.body.classList.remove("is-leaving");
+        pageTransitionActive = false;
+      }, 1200);
+    };
+
+    if (prefersReducedMotion()) {
+      navigate();
+      return;
+    }
+
+    const startLeaving = () => document.body.classList.add("is-leaving");
+
+    if (document.startViewTransition) {
+      const transition = document.startViewTransition(startLeaving);
+      transition.ready.finally(() => window.setTimeout(navigate, 90));
+    } else {
+      startLeaving();
+      window.setTimeout(navigate, 170);
+    }
+  });
+};
+
 const renderProjects = (category = "All") => {
   const container = $("[data-projects]");
   if (!container) return;
@@ -202,22 +334,6 @@ const renderPlaylists = () => {
   });
 };
 
-const renderUpdates = () => {
-  const container = $("[data-updates]");
-  if (!container) return;
-  container.innerHTML = "";
-
-  siteData.updates.forEach((update) => {
-    const item = createElement("article", "timeline-item");
-    item.append(
-      createElement("time", "", new Date(`${update.date}T00:00:00`).toLocaleDateString()),
-      createElement("h3", "", update.title),
-      createElement("p", "", update.text),
-    );
-    container.append(item);
-  });
-};
-
 const renderSkills = () => {
   const container = $("[data-skills]");
   if (!container) return;
@@ -257,6 +373,145 @@ const renderSocialLinks = () => {
   });
 };
 
+const renderFooterSocials = () => {
+  const containers = $$("[data-footer-socials]");
+  if (!containers.length) return;
+  containers.forEach((container) => {
+    container.innerHTML = "";
+    siteData.contactLinks.forEach((item) => {
+      const link = createElement("a", "footer-social");
+      link.setAttribute("aria-label", item.label);
+      setLinkTarget(link, item.url);
+      if (item.icon) {
+        const icon = createElement("img");
+        icon.src = item.icon;
+        icon.alt = "";
+        icon.loading = "lazy";
+        link.append(icon);
+      } else {
+        link.textContent = item.label.slice(0, 2);
+      }
+      container.append(link);
+    });
+  });
+};
+
+const setupContactForm = () => {
+  const form = $("[data-contact-form]");
+  if (!form) return;
+
+  const status = form.querySelector("[data-contact-status]");
+  const draftKey = "mr-monkey-contact-draft";
+  const draftFields = ["name", "email", "topic", "message"];
+  let messageSent = false;
+  let captchaComplete = false;
+
+  const setStatus = (message, type = "") => {
+    if (!status) return;
+    status.textContent = message;
+    status.dataset.type = type;
+  };
+
+  const readDraft = () => {
+    try {
+      return JSON.parse(sessionStorage.getItem(draftKey) || "{}");
+    } catch (error) {
+      return {};
+    }
+  };
+
+  const writeDraft = () => {
+    const draft = {};
+    draftFields.forEach((name) => {
+      const field = form.elements[name];
+      if (field && field.value) draft[name] = field.value;
+    });
+    try {
+      if (Object.keys(draft).length) {
+        sessionStorage.setItem(draftKey, JSON.stringify(draft));
+      } else {
+        sessionStorage.removeItem(draftKey);
+      }
+    } catch (error) {
+      // Draft saving is helpful, but the form still works if storage is unavailable.
+    }
+  };
+
+  const clearDraft = () => {
+    try {
+      sessionStorage.removeItem(draftKey);
+    } catch (error) {
+      // Nothing to clear if storage is unavailable.
+    }
+  };
+
+  const hasFormData = () => draftFields.some((name) => {
+    const field = form.elements[name];
+    return field && field.value.trim();
+  });
+
+  const restoreDraft = () => {
+    const draft = readDraft();
+    const hasDraft = Object.keys(draft).length > 0;
+    if (!hasDraft) return;
+
+    draftFields.forEach((name) => {
+      const field = form.elements[name];
+      if (field && draft[name]) field.value = draft[name];
+    });
+
+    setStatus(
+      currentNavigationType() === "reload" ? "Draft restored after refresh." : "Draft restored.",
+      "pending",
+    );
+  };
+
+  window.contactCaptchaComplete = () => {
+    captchaComplete = true;
+    if (status && status.dataset.type === "error") {
+      setStatus("", "");
+    }
+  };
+
+  window.contactCaptchaExpired = () => {
+    captchaComplete = false;
+  };
+
+  restoreDraft();
+
+  draftFields.forEach((name) => {
+    const field = form.elements[name];
+    if (!field) return;
+    field.addEventListener("input", () => {
+      messageSent = false;
+      writeDraft();
+    });
+    field.addEventListener("change", () => {
+      messageSent = false;
+      writeDraft();
+    });
+  });
+
+  window.addEventListener("beforeunload", (event) => {
+    if (messageSent || !hasFormData()) return;
+    event.preventDefault();
+    event.returnValue = "";
+  });
+
+  form.addEventListener("submit", (event) => {
+    const captchaResponse = form.querySelector("[name='g-recaptcha-response']");
+    const hasCaptcha = captchaComplete || (captchaResponse && captchaResponse.value);
+    if (!hasCaptcha) {
+      event.preventDefault();
+      setStatus("Please complete the reCAPTCHA checkbox before sending.", "error");
+      return;
+    }
+
+    messageSent = true;
+    clearDraft();
+  });
+};
+
 const rewriteStaticInternalLinks = () => {
   if (window.location.protocol !== "file:") return;
   $$("a[href^='/']").forEach((link) => {
@@ -279,7 +534,6 @@ const hydrateSite = () => {
   setText("[data-footer-name]", siteData.name);
   setText("[data-project-count]", siteData.projects.length);
   setText("[data-video-count]", siteData.videos.length);
-  setText("[data-update-count]", siteData.updates.length);
 
   const channelLink = $("[data-youtube-channel]");
   setLinkTarget(channelLink, siteData.youtubeChannel);
@@ -288,10 +542,11 @@ const hydrateSite = () => {
   renderProjects();
   renderVideos();
   renderPlaylists();
-  renderUpdates();
   renderSkills();
   renderContactLinks();
   renderSocialLinks();
+  renderFooterSocials();
+  setupContactForm();
 };
 
 const setupNavigation = () => {
@@ -299,16 +554,25 @@ const setupNavigation = () => {
   const nav = $(".site-nav");
   if (!toggle || !nav) return;
 
+  const closeNav = () => {
+    nav.classList.remove("is-open");
+    toggle.setAttribute("aria-expanded", "false");
+  };
+
   toggle.addEventListener("click", () => {
     const isOpen = nav.classList.toggle("is-open");
     toggle.setAttribute("aria-expanded", String(isOpen));
   });
 
   $$(".site-nav a").forEach((link) => {
-    link.addEventListener("click", () => {
-      nav.classList.remove("is-open");
-      toggle.setAttribute("aria-expanded", "false");
-    });
+    link.addEventListener("click", closeNav);
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!nav.classList.contains("is-open")) return;
+    if (!(event.target instanceof Element)) return;
+    if (nav.contains(event.target) || toggle.contains(event.target)) return;
+    closeNav();
   });
 };
 
@@ -343,3 +607,4 @@ hydrateSite();
 rewriteStaticInternalLinks();
 setupNavigation();
 markActivePage();
+setupPageTransitions();

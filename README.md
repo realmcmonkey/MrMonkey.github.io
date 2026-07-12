@@ -1,15 +1,14 @@
 # Mr. Monkey Website
 
-This is a static website for the Mr. Monkey YouTube channel. It is designed for GitHub Pages and includes separate pages for YouTube videos, Minecraft creations, an update log, about text, skills/focus areas, and social links.
+This is a static website for the Mr. Monkey YouTube channel. It is designed for GitHub Pages and includes separate pages for YouTube videos, Minecraft creations, about text, skills/focus areas, and social links.
 
 ## How to customize it
 
-Most updates happen in `site-data.js`.
+Most content changes happen in `site-data.js`.
 
 - Change the channel name, hero text, about text, and contact copy at the top.
 - Add Minecraft items/builds to the `projects` array.
 - Add YouTube videos to the `videos` array by changing the `videoId`.
-- Add milestones or news to the `updates` array.
 - Add focus areas to the `skills` array.
 - Add contact/social links to the `contactLinks` array.
 
@@ -19,7 +18,6 @@ Most updates happen in `site-data.js`.
 - `pages/main/index.html` is the home page.
 - `pages/main/creations.html` is for Minecraft creations.
 - `pages/main/videos.html` is for YouTube videos.
-- `pages/main/updates.html` is the update log.
 - `pages/main/about.html` explains the channel.
 - `pages/main/contact.html` links to social profiles.
 - `pages/creations/` contains individual creation project pages.

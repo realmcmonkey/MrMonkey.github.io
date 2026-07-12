@@ -10,16 +10,16 @@ const siteData = {
   youtubeChannel: "https://youtube.com/mrmonkeygaming",
   aboutTitle: "Welcome to the Mr. Monkey hub.",
   aboutText:
-    "This site is being built as the main place for Mr. Monkey videos, Minecraft items, builds, updates, and anything new that gets added later.",
+    "This site is being built as the main place for Mr. Monkey videos, Minecraft items, builds, custom projects, and anything new that gets added later.",
   contactCopy:
-    "Follow Mr. Monkey on YouTube and socials. More contact options can be added later if needed.",
+    "Send a message about Minecraft maps, videos, the website, or anything Mr. Monkey related. You can also follow along on YouTube and socials.",
   skills: [
     "Minecraft builds",
     "Minecraft items",
     "Gaming videos",
     "YouTube shorts",
     "Custom images",
-    "Community updates",
+    "Community posts",
   ],
   projects: [
     {
@@ -77,18 +77,6 @@ const siteData = {
     },
   ],
   playlists: [],
-  updates: [
-    {
-      date: "2026-07-11",
-      title: "Mr. Monkey website started",
-      text: "The first version is ready for YouTube videos, Minecraft items, builds, and future updates.",
-    },
-    {
-      date: "2026-07-01",
-      title: "Future updates area",
-      text: "New videos, Minecraft items, custom images, and site changes can be posted here.",
-    },
-  ],
   contactLinks: [
     {
       label: "YouTube",

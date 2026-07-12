@@ -27,6 +27,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../assets/css/style.css" />
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -43,7 +44,6 @@
         <a href="/">Home</a>
         <a href="/creations/">Creations</a>
         <a href="/videos/">YouTube</a>
-        <a href="/updates/">Updates</a>
         <a href="/about/">About</a>
         <a href="/contact/">Contact</a>
       </nav>
@@ -53,18 +53,58 @@
       <section class="section contact">
         <div>
           <p class="eyebrow">Contact</p>
-          <h1>Follow Mr. Monkey.</h1>
+          <h1>Contact Mr. Monkey.</h1>
           <p data-contact-copy>
             Follow Mr. Monkey on YouTube and socials. More contact options can be added later if
             needed.
           </p>
+          <div class="contact-links" data-contact-links></div>
         </div>
-        <div class="contact-links" data-contact-links></div>
+        <form class="contact-form" action="https://formspree.io/f/meeyjvor" method="POST" data-contact-form>
+          <input type="hidden" name="_subject" value="New message from Mr. Monkey website" />
+          <input class="form-honeypot" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+          <div class="form-row">
+            <label for="contact-name">Name</label>
+            <input id="contact-name" name="name" type="text" autocomplete="name" required />
+          </div>
+          <div class="form-row">
+            <label for="contact-email">Email</label>
+            <input id="contact-email" name="email" type="email" autocomplete="email" required />
+          </div>
+          <div class="form-row">
+            <label for="contact-topic">What is this about?</label>
+            <select id="contact-topic" name="topic" required>
+              <option value="">Choose one</option>
+              <option value="Minecraft map">Minecraft map</option>
+              <option value="YouTube video">YouTube video</option>
+              <option value="Business inquiry or sponsorship">Business inquiry / Sponsorship</option>
+              <option value="Website">Website</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="contact-message">Message</label>
+            <textarea id="contact-message" name="message" rows="6" required></textarea>
+          </div>
+          <div class="recaptcha-wrap">
+            <div
+              class="g-recaptcha"
+              data-sitekey="6Ld2sU8tAAAAAOVWlUCRJ9H_cnXbKo-w4_RzwfgA"
+              data-theme="dark"
+              data-callback="contactCaptchaComplete"
+              data-expired-callback="contactCaptchaExpired"
+            ></div>
+          </div>
+          <button class="button primary" type="submit" data-contact-submit>Send Message</button>
+          <p class="form-status" data-contact-status aria-live="polite"></p>
+          <p class="form-note">This sends your message through Formspree.</p>
+        </form>
       </section>
     </main>
 
     <footer class="site-footer">
-      <span data-footer-name>Mr. Monkey</span>
+      <p class="footer-note">&copy; 2026 Mr. Monkey</p>
+      <div class="footer-socials" data-footer-socials aria-label="Social links"></div>
     </footer>
 
     <script src="../assets/js/site-data.js"></script>
