@@ -51,16 +51,36 @@
 
     <main>
       <section class="section contact">
-        <div>
+        <div class="contact-intro">
           <p class="eyebrow">Contact</p>
-          <h1>Contact Mr. Monkey.</h1>
+          <h1>Let's make something happen.</h1>
           <p data-contact-copy>
             Follow Mr. Monkey on YouTube and socials. More contact options can be added later if
             needed.
           </p>
+          <div class="contact-highlights" aria-label="Good reasons to send a message">
+            <div>
+              <span>Maps</span>
+              <p>Minecraft map questions, bug reports, ideas, or feedback.</p>
+            </div>
+            <div>
+              <span>Videos</span>
+              <p>Video ideas, channel questions, and collaboration messages.</p>
+            </div>
+            <div>
+              <span>Business</span>
+              <p>Sponsorships, partnerships, and other serious inquiries.</p>
+            </div>
+          </div>
+          <p class="contact-kicker">Prefer socials? Find Mr. Monkey here:</p>
           <div class="contact-links" data-contact-links></div>
         </div>
         <form class="contact-form" data-contact-form data-contact-endpoint="https://formspree.io/f/meeyjvor">
+          <div class="form-heading">
+            <p class="eyebrow">Message</p>
+            <h2>Send a note.</h2>
+            <p>Use this for questions, ideas, business inquiries, sponsorships, or anything site related.</p>
+          </div>
           <input type="hidden" name="_subject" value="New message from Mr. Monkey website" />
           <input class="form-honeypot" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
           <div class="form-row">
@@ -97,7 +117,6 @@
           </div>
           <button class="button primary" type="button" data-contact-submit>Send Message</button>
           <p class="form-status" data-contact-status aria-live="polite"></p>
-          <p class="form-note">This sends your message through Formspree.</p>
         </form>
       </section>
     </main>

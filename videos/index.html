@@ -27,6 +27,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../assets/css/style.css" />
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -53,7 +54,23 @@
         <p class="eyebrow">YouTube</p>
         <h1>Featured videos</h1>
         <p>Watch Mr. Monkey uploads, Minecraft videos, shorts, challenges, and channel highlights.</p>
-        <a class="button primary" data-youtube-channel href="#" target="_blank" rel="noreferrer">Visit channel</a>
+        <div class="subscribe-widget" data-subscribe-widget aria-label="Subscribe to Mr. Monkey on YouTube">
+          <div
+            class="g-ytsubscribe"
+            data-channelid="UCRPfEI90TUrGycrAbqZUSTg"
+            data-layout="full"
+            data-count="default"
+          ></div>
+          <a
+            class="button primary subscribe-fallback"
+            data-subscribe-fallback
+            href="https://www.youtube.com/channel/UCRPfEI90TUrGycrAbqZUSTg?sub_confirmation=1"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Subscribe on YouTube
+          </a>
+        </div>
       </section>
 
       <section class="section">

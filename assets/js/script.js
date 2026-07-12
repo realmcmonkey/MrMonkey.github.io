@@ -263,6 +263,7 @@ const renderVideos = () => {
   const container = $("[data-videos]");
   if (!container) return;
   container.innerHTML = "";
+  container.classList.toggle("single-video", siteData.videos.length === 1);
 
   siteData.videos.forEach((video) => {
     const card = createElement("article", "video-card");
@@ -314,13 +315,19 @@ const renderPlaylists = () => {
     setLinkTarget(thumbLink, playlist.url);
     thumbLink.setAttribute("aria-label", `View ${playlist.title} playlist`);
 
-    const image = createElement("img");
-    image.src = playlist.thumbnail;
-    image.alt = `${playlist.title} playlist thumbnail`;
-    image.loading = "lazy";
+    if (playlist.thumbnail) {
+      const image = createElement("img");
+      image.src = playlist.thumbnail;
+      image.alt = `${playlist.title} playlist thumbnail`;
+      image.loading = "lazy";
+      thumbLink.append(image);
+    } else {
+      const fallback = createElement("span", "playlist-thumb-fallback", playlist.title);
+      thumbLink.append(fallback);
+    }
     const play = createElement("span", "playlist-play");
     play.setAttribute("aria-hidden", "true");
-    thumbLink.append(image, play);
+    thumbLink.append(play);
 
     const body = createElement("div", "playlist-body");
     const title = createElement("h3", "", playlist.title);
@@ -699,8 +706,34 @@ const markActivePage = () => {
   });
 };
 
+const setupSubscribeWidget = () => {
+  const widget = document.querySelector("[data-subscribe-widget]");
+  if (!widget) return;
+
+  const officialButton = widget.querySelector(".g-ytsubscribe");
+  const fallbackButton = widget.querySelector("[data-subscribe-fallback]");
+  if (!officialButton || !fallbackButton) return;
+
+  const syncFallback = () => {
+    const officialRendered = officialButton.children.length > 0 || Boolean(officialButton.querySelector("iframe"));
+    fallbackButton.hidden = officialRendered;
+    widget.classList.toggle("is-loaded", officialRendered);
+  };
+
+  syncFallback();
+
+  if ("MutationObserver" in window) {
+    const observer = new MutationObserver(syncFallback);
+    observer.observe(officialButton, { childList: true, subtree: true });
+  }
+
+  window.setTimeout(syncFallback, 1200);
+  window.setTimeout(syncFallback, 3000);
+};
+
 hydrateSite();
 rewriteStaticInternalLinks();
 setupNavigation();
 markActivePage();
+setupSubscribeWidget();
 setupPageTransitions();

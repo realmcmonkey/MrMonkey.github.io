@@ -69,14 +69,27 @@ const siteData = {
       videoId: "",
       url: "https://youtube.com/mrmonkeygaming",
     },
+  ],
+  playlists: [
     {
-      title: "Minecraft Video Slot",
-      description: "This can become a build video, short, tutorial, challenge, or channel trailer.",
-      videoId: "",
-      url: "https://youtube.com/mrmonkeygaming",
+      title: "Minecraft",
+      description: "Minecraft videos, maps, builds, challenges, and Mr. Monkey creations.",
+      url: "https://youtube.com/playlist?list=PLhqtivGUXKzxNefzFRGMRz7v_U4QJx21o&si=2NCnz6gvtjemd8Qb",
+      thumbnail: imageUrl("playlist-minecraft.png"),
+    },
+    {
+      title: "Hytale",
+      description: "Hytale videos, reactions, updates, and gameplay videos.",
+      url: "https://youtube.com/playlist?list=PLhqtivGUXKzxP_NNA6X61icSR_UobQ-oS&si=UDdtMsOzfA3_zzKK",
+      thumbnail: imageUrl("playlist-hytale.png"),
+    },
+    {
+      title: "Roblox",
+      description: "Roblox videos, games, funny moments, and extra channel variety.",
+      url: "https://youtube.com/playlist?list=PLhqtivGUXKzzpq5m3mTrC7K5QFaxGo7qC&si=sPfIeM7osmsEfR4_",
+      thumbnail: imageUrl("playlist-roblox.png"),
     },
   ],
-  playlists: [],
   contactLinks: [
     {
       label: "YouTube",
