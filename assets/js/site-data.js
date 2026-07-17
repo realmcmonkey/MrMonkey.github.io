@@ -110,7 +110,7 @@ const siteData = {
     {
       label: "X",
       url: "https://x.com/realmcmonkey",
-      icon: "https://cdn.simpleicons.org/x/000000",
+      icon: "https://cdn.simpleicons.org/x/FFFFFF",
     },
   ],
 };
