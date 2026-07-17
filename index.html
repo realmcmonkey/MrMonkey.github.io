@@ -57,49 +57,75 @@
       </nav>
     </header>
 
-    <main>
-      <section id="home" class="hero section">
-        <div class="hero-copy">
+    <main class="home-world">
+      <section id="home" class="world-hero">
+        <a class="world-hero-scene" href="/creations/" aria-label="Explore Mr. Monkey creations">
+          <img src="assets/images/home-hero-minecraft.png" alt="Minecraft forest scene" />
+        </a>
+        <div class="world-hero-shade" aria-hidden="true"></div>
+
+        <div class="world-hero-copy">
+          <p class="eyebrow">Official Creator Hub</p>
           <h1 data-hero-title>Build a portfolio that grows with every new project.</h1>
-          <span class="hero-rule"></span>
           <p class="hero-text" data-hero-text>
             A home for YouTube videos, Minecraft creations, and future projects.
           </p>
-          <div class="social-links" data-social-links></div>
+          <div class="social-links" data-social-links aria-label="Mr. Monkey social links"></div>
         </div>
+
       </section>
 
-      <section class="announcement-wrap" aria-label="Coming soon announcement">
-        <div class="announcement-card">
-          <a class="announcement-media" href="/creations/minute-to-win-it/" aria-label="Learn more about Minute to Win It">
-            <img
-              src="assets/images/minute-to-win-it-minecraft-edition.png"
-              alt="Minute to Win It Minecraft Edition arena preview"
-            />
-            <span class="announcement-badge">25% Complete</span>
-          </a>
-          <div class="announcement-copy">
-            <p class="eyebrow">New Map Coming Soon</p>
-            <h2>Minute to Win It &mdash; COMING SOON</h2>
-            <p>
-              Fast 60-second Minecraft challenges built for videos, game nights, and multiplayer chaos.
-            </p>
-            <div class="mini-progress" aria-label="Minute to Win It development progress">
-              <span class="progress-track">
-                <span class="progress-fill" style="--progress: 25%"></span>
-              </span>
-            </div>
+      <section id="whats-new" class="world-release" aria-label="Coming soon announcement">
+        <a class="world-release-scene" href="/creations/minute-to-win-it/" aria-label="Learn more about Minute to Win It">
+          <img
+            src="assets/images/minute-to-win-it-minecraft-edition.png"
+            alt="Minute to Win It Minecraft Edition arena preview"
+          />
+        </a>
+        <div class="world-release-shade" aria-hidden="true"></div>
+        <div class="world-release-copy">
+          <p class="eyebrow">New Map Coming Soon</p>
+          <h2>Minute to Win It &mdash; <span>COMING SOON</span></h2>
+          <p>
+            Fast 60-second Minecraft challenges built for videos, game nights, and multiplayer chaos.
+          </p>
+          <span class="announcement-badge">25% Complete</span>
+          <div class="mini-progress" aria-label="Minute to Win It development progress">
+            <span class="progress-track">
+              <span class="progress-fill" style="--progress: 25%"></span>
+            </span>
           </div>
-          <a class="button primary announcement-button" href="/creations/minute-to-win-it/">Learn More</a>
+          <a class="button primary" href="/creations/minute-to-win-it/">Learn More</a>
         </div>
       </section>
 
-      <section class="section intro-band creations-preview" aria-label="Featured creations">
-        <div class="section-heading">
-          <h2>Creations</h2>
+      <section class="world-library creations-preview creation-showcase" aria-label="Featured creations">
+        <div class="world-library-heading">
+          <div>
+            <p class="eyebrow">Featured Creations</p>
+            <h2>Latest from the project library</h2>
+          </div>
+          <a class="text-link" href="/creations/">View all creations</a>
         </div>
         <div class="card-grid compact-creations" data-projects data-project-limit="3"></div>
-        <a class="button light" href="/creations/">See More Creations</a>
+      </section>
+
+      <section class="world-onward" aria-label="Keep exploring Mr. Monkey">
+        <a class="world-video-route" href="/videos/">
+          <span class="eyebrow">YouTube</span>
+          <strong>Watch Videos</strong>
+        </a>
+        <div class="world-about-route" aria-label="About Mr. Monkey">
+          <div>
+            <p class="eyebrow">About Mr. Monkey</p>
+            <h2>Games, maps, videos, and whatever gets built next.</h2>
+          </div>
+          <p>
+            This is the main hub for Mr. Monkey projects, from Minecraft creations and skin packs to
+            YouTube videos and future ideas.
+          </p>
+          <a class="text-link" href="/about/">Read More</a>
+        </div>
       </section>
     </main>
 

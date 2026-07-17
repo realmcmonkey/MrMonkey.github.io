@@ -39,6 +39,49 @@ const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: r
 
 const navTransitionKey = "mr-monkey-page-transition";
 let pageTransitionActive = false;
+let currentProjectCategory = "All";
+let currentProjectSort = "created";
+let projectProgressHasAnimated = false;
+
+const projectFilterParam = {
+  All: "all",
+  Creations: "creations",
+  "Skin Packs": "skin-packs",
+};
+
+const projectCategoryFromParam = (value) => (
+  Object.entries(projectFilterParam).find(([, slug]) => slug === value)?.[0] || "All"
+);
+
+const readProjectControls = () => {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    category: projectCategoryFromParam(params.get("filter")),
+    sort: ["created", "updated"].includes(params.get("sort")) ? params.get("sort") : "created",
+  };
+};
+
+const writeProjectControls = (mode = "push") => {
+  const url = new URL(window.location.href);
+  if (currentProjectCategory === "All") {
+    url.searchParams.delete("filter");
+  } else {
+    url.searchParams.set("filter", projectFilterParam[currentProjectCategory] || "all");
+  }
+
+  if (currentProjectSort === "created") {
+    url.searchParams.delete("sort");
+  } else {
+    url.searchParams.set("sort", currentProjectSort);
+  }
+
+  const nextUrl = url.href;
+  if (mode === "replace") {
+    window.history.replaceState({}, "", nextUrl);
+  } else {
+    window.history.pushState({}, "", nextUrl);
+  }
+};
 
 const readTransitionMarker = () => {
   try {
@@ -167,34 +210,62 @@ const setupPageTransitions = () => {
   });
 };
 
-const renderProjects = (category = "All") => {
+const getProjectSortValue = (project, sortMode) => {
+  if (sortMode === "updated") {
+    return Number(project.lastUpdatedYear || project.createdYear || project.year || 0);
+  }
+  return Number(project.createdYear || project.year || 0);
+};
+
+const sortProjects = (projects, sortMode) => [...projects].sort((first, second) => {
+  if (first.isComingSoon && !second.isComingSoon) return -1;
+  if (!first.isComingSoon && second.isComingSoon) return 1;
+  const dateDifference = getProjectSortValue(second, sortMode) - getProjectSortValue(first, sortMode);
+  if (dateDifference) return dateDifference;
+  return first.title.localeCompare(second.title);
+});
+
+const renderProjects = (category = currentProjectCategory, sortMode = currentProjectSort) => {
   const container = $("[data-projects]");
   if (!container) return;
   const limit = Number(container.dataset.projectLimit || 0);
   const isCompact = container.classList.contains("compact-creations");
-  const projects = siteData.projects.filter(
+  const projects = sortProjects(siteData.projects.filter(
     (project) => category === "All" || project.category === category,
-  ).slice(0, limit || undefined);
+  ), sortMode).slice(0, limit || undefined);
   container.innerHTML = "";
 
   projects.forEach((project) => {
     const card = createElement("article", "project-card");
     if (project.status) card.dataset.status = project.status;
+    if (project.isComingSoon) card.dataset.upcoming = "true";
+
+    const media = createElement("div", "project-media");
 
     if (project.image) {
       const image = createElement("img");
       image.src = project.image;
       image.alt = `${project.title} preview`;
-      image.loading = "lazy";
-      card.append(image);
+      media.style.setProperty("--project-image", `url("${project.image}")`);
+      media.append(image);
     } else {
       const teaser = createElement("div", "project-teaser");
       teaser.innerHTML = "<span>Coming Soon</span>";
-      card.append(teaser);
+      media.append(teaser);
     }
 
+    if (project.isComingSoon) {
+      media.append(createElement("span", "project-media-badge", "Coming Soon"));
+    }
+
+    card.append(media);
+
     const body = createElement("div", "card-body");
-    const meta = createElement("p", "card-meta", `${project.category} | ${project.year}`);
+    const dateMeta = project.isComingSoon
+      ? "Coming Soon"
+      : `Created ${project.year}`;
+    const updatedMeta = project.lastUpdatedYear ? ` | Updated ${project.lastUpdatedYear}` : "";
+    const meta = createElement("p", "card-meta", `${project.category} | ${dateMeta}${updatedMeta}`);
     const title = createElement("h3", "", project.title);
     const description = createElement("p", "", project.description);
     const progress = project.progress
@@ -212,6 +283,9 @@ const renderProjects = (category = "All") => {
       );
       const track = createElement("span", "progress-track");
       const fill = createElement("span", "progress-fill");
+      if (projectProgressHasAnimated) {
+        fill.classList.add("no-animate");
+      }
       fill.style.setProperty("--progress", `${project.progress}%`);
       track.append(fill);
       progress.append(label, track);
@@ -230,32 +304,63 @@ const renderProjects = (category = "All") => {
     card.append(body);
     container.append(card);
   });
+  projectProgressHasAnimated = true;
 };
 
 const renderFilters = () => {
   const filters = $("[data-project-filters]");
   if (!filters) return;
   const heading = $("[data-project-heading]");
+  const sortControl = $("[data-project-sort]");
   const headings = {
     All: "Creations",
     Creations: "Maps and Games",
     "Skin Packs": "Skin Packs",
   };
   const categories = ["All", ...new Set(siteData.projects.map((project) => project.category))];
+  const savedControls = readProjectControls();
+  if (categories.includes(savedControls.category)) {
+    currentProjectCategory = savedControls.category;
+  }
+  if (["created", "updated"].includes(savedControls.sort)) {
+    currentProjectSort = savedControls.sort;
+  }
   filters.innerHTML = "";
-  if (heading) heading.textContent = headings.All;
+  if (heading) heading.textContent = headings[currentProjectCategory] || currentProjectCategory;
 
-  categories.forEach((category, index) => {
+  categories.forEach((category) => {
     const button = createElement("button", "filter-button", category);
     button.type = "button";
-    button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
+    button.setAttribute("aria-pressed", category === currentProjectCategory ? "true" : "false");
     button.addEventListener("click", () => {
+      if (currentProjectCategory === category) return;
+      currentProjectCategory = category;
+      writeProjectControls();
       $$(".filter-button").forEach((filter) => filter.setAttribute("aria-pressed", "false"));
       button.setAttribute("aria-pressed", "true");
       if (heading) heading.textContent = headings[category] || category;
-      renderProjects(category);
+      renderProjects(currentProjectCategory, currentProjectSort);
     });
     filters.append(button);
+  });
+
+  if (sortControl) {
+    sortControl.value = currentProjectSort;
+    sortControl.onchange = () => {
+      if (currentProjectSort === sortControl.value) return;
+      currentProjectSort = sortControl.value;
+      writeProjectControls();
+      renderProjects(currentProjectCategory, currentProjectSort);
+    };
+  }
+};
+
+const setupProjectUrlControls = () => {
+  if (!$("[data-projects]") || !$("[data-project-filters]")) return;
+
+  window.addEventListener("popstate", () => {
+    renderFilters();
+    renderProjects(currentProjectCategory, currentProjectSort);
   });
 };
 
@@ -319,7 +424,6 @@ const renderPlaylists = () => {
       const image = createElement("img");
       image.src = playlist.thumbnail;
       image.alt = `${playlist.title} playlist thumbnail`;
-      image.loading = "lazy";
       thumbLink.append(image);
     } else {
       const fallback = createElement("span", "playlist-thumb-fallback", playlist.title);
@@ -353,8 +457,17 @@ const renderContactLinks = () => {
   if (!container) return;
   container.innerHTML = "";
   siteData.contactLinks.forEach((item) => {
-    const link = createElement("a", "contact-link", item.label);
+    const link = createElement("a", "contact-link");
+    link.setAttribute("aria-label", item.label);
     setLinkTarget(link, item.url);
+    if (item.icon) {
+      const icon = createElement("img");
+      icon.src = item.icon;
+      icon.alt = "";
+      link.append(icon);
+    } else {
+      link.textContent = item.label.slice(0, 2);
+    }
     container.append(link);
   });
 };
@@ -710,12 +823,17 @@ const setupSubscribeWidget = () => {
   const widget = document.querySelector("[data-subscribe-widget]");
   if (!widget) return;
 
-  const officialButton = widget.querySelector(".g-ytsubscribe");
   const fallbackButton = widget.querySelector("[data-subscribe-fallback]");
-  if (!officialButton || !fallbackButton) return;
+  if (!fallbackButton) return;
 
   const syncFallback = () => {
-    const officialRendered = officialButton.children.length > 0 || Boolean(officialButton.querySelector("iframe"));
+    const officialButton = widget.querySelector(".g-ytsubscribe");
+    const officialFrame = widget.querySelector('iframe[src*="youtube.com/subscribe_embed"]');
+    const officialBounds = officialButton?.getBoundingClientRect();
+    const officialRendered =
+      Boolean(officialFrame) ||
+      Boolean(officialButton?.children.length) ||
+      Boolean(officialBounds && officialBounds.width > 0 && officialBounds.height > 0);
     fallbackButton.hidden = officialRendered;
     widget.classList.toggle("is-loaded", officialRendered);
   };
@@ -724,11 +842,174 @@ const setupSubscribeWidget = () => {
 
   if ("MutationObserver" in window) {
     const observer = new MutationObserver(syncFallback);
-    observer.observe(officialButton, { childList: true, subtree: true });
+    observer.observe(widget, { childList: true, subtree: true });
   }
 
   window.setTimeout(syncFallback, 1200);
   window.setTimeout(syncFallback, 3000);
+};
+
+const setupScrollReveals = () => {
+  if (prefersReducedMotion()) return;
+  const items = $$(
+    [
+      ".video-card",
+      ".playlist-card",
+      ".feature-grid article",
+      ".project-gallery img",
+      ".project-image-stack img",
+      ".development-progress",
+      ".download-panel",
+      ".contact-form",
+      ".about-visual",
+      ".about-story-panel",
+      ".world-release",
+      ".home-world .project-card",
+      ".world-onward",
+      ".creation-store .project-card",
+      ".story-timeline-entry",
+      ".story-era-divider",
+      ".skill-panel",
+      ".not-found-content",
+    ].join(","),
+  );
+  if (!items.length) return;
+
+  if (!("IntersectionObserver" in window)) {
+    items.forEach((item) => item.classList.add("is-visible"));
+    return;
+  }
+
+  items.forEach((item) => item.classList.add("reveal-item"));
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    },
+    { rootMargin: "0px 0px -10% 0px", threshold: 0.12 },
+  );
+  items.forEach((item) => observer.observe(item));
+};
+
+const setupAnimatedDetails = () => {
+  if (prefersReducedMotion()) return;
+  const detailsItems = $$(".animated-details");
+
+  detailsItems.forEach((details) => {
+    const summary = details.querySelector(":scope > summary");
+    if (!summary) return;
+    let animation = null;
+    let isClosing = false;
+    let isOpening = false;
+    let stopScrollLock = null;
+
+    const lockSummaryPosition = () => {
+      const lockedTop = summary.getBoundingClientRect().top;
+      let frame = 0;
+      let active = true;
+      const hold = () => {
+        if (!active) return;
+        const currentTop = summary.getBoundingClientRect().top;
+        const delta = currentTop - lockedTop;
+        if (Math.abs(delta) > 0.1) {
+          window.scrollBy(0, delta);
+        }
+        frame = window.requestAnimationFrame(hold);
+      };
+
+      hold();
+      return () => {
+        active = false;
+        window.cancelAnimationFrame(frame);
+      };
+    };
+
+    const finishAnimation = (shouldOpen) => {
+      details.open = shouldOpen;
+      animation = null;
+      isClosing = false;
+      isOpening = false;
+      details.style.height = shouldOpen ? "auto" : "";
+      details.style.overflow = shouldOpen ? "visible" : "";
+      if (stopScrollLock) {
+        stopScrollLock();
+        stopScrollLock = null;
+      }
+    };
+
+    const close = () => {
+      isClosing = true;
+      stopScrollLock = lockSummaryPosition();
+      const startHeight = `${details.offsetHeight}px`;
+      const endHeight = `${summary.offsetHeight}px`;
+
+      if (animation) animation.cancel();
+      details.style.height = startHeight;
+      details.style.overflow = "hidden";
+      animation = details.animate(
+        { height: [startHeight, endHeight] },
+        { duration: 180, easing: "cubic-bezier(0.2, 0, 0, 1)" },
+      );
+      animation.onfinish = () => finishAnimation(false);
+      animation.oncancel = () => {
+        isClosing = false;
+      };
+    };
+
+    const open = () => {
+      isOpening = true;
+      stopScrollLock = lockSummaryPosition();
+      const startHeight = `${summary.offsetHeight}px`;
+      details.open = true;
+      details.style.height = "auto";
+      const endHeight = `${details.offsetHeight}px`;
+      details.style.height = startHeight;
+      window.requestAnimationFrame(() => {
+        if (animation) animation.cancel();
+        details.style.overflow = "hidden";
+        animation = details.animate(
+          { height: [startHeight, endHeight] },
+          { duration: 220, easing: "cubic-bezier(0.2, 0, 0, 1)" },
+        );
+        animation.onfinish = () => finishAnimation(true);
+        animation.oncancel = () => {
+          isOpening = false;
+        };
+      });
+    };
+
+    summary.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (isClosing || !details.open) {
+        if (details.classList.contains("story-era")) {
+          $$(".channel-story .story-era[open]").forEach((chapter) => {
+            if (chapter !== details) chapter.open = false;
+          });
+        }
+        open();
+      } else if (isOpening || details.open) {
+        close();
+      }
+    });
+  });
+};
+
+const setupStoryChapters = () => {
+  const entries = $$(".story-timeline-entry");
+  if (!entries.length) return;
+
+  $$(".story-jump-nav a[href^='#story-']").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const entry = document.querySelector(link.getAttribute("href"));
+      if (!entry?.classList.contains("story-timeline-entry")) return;
+      event.preventDefault();
+      history.pushState(null, "", link.getAttribute("href"));
+      entry.scrollIntoView({ block: "start", behavior: prefersReducedMotion() ? "auto" : "smooth" });
+    });
+  });
 };
 
 hydrateSite();
@@ -736,4 +1017,8 @@ rewriteStaticInternalLinks();
 setupNavigation();
 markActivePage();
 setupSubscribeWidget();
+setupScrollReveals();
+setupAnimatedDetails();
+setupStoryChapters();
+setupProjectUrlControls();
 setupPageTransitions();

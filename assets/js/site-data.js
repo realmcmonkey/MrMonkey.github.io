@@ -2,30 +2,32 @@ const imageUrl = (file) => new URL(`../images/${file}`, document.currentScript.s
 
 const siteData = {
   name: "Mr. Monkey",
-  brandName: "Monkey Fan Site",
+  brandName: "Mr. Monkey",
   initials: "MM",
   role: "Minecraft & More",
   heroTitle: "Mr. Monkey",
   heroText: "Minecraft & More",
   youtubeChannel: "https://youtube.com/mrmonkeygaming",
-  aboutTitle: "Welcome to the Mr. Monkey hub.",
+  aboutTitle: "Meet Mr. Monkey",
   aboutText:
-    "This site is being built as the main place for Mr. Monkey videos, Minecraft items, builds, custom projects, and anything new that gets added later.",
+    "Mr. Monkey is a Minecraft and gaming creator building maps, skin packs, videos, and fun projects for people who like creative worlds, challenges, and channel updates.",
   contactCopy:
     "Send a message about Minecraft maps, videos, the website, or anything Mr. Monkey related. You can also follow along on YouTube and socials.",
   skills: [
-    "Minecraft builds",
-    "Minecraft items",
+    "Minecraft maps",
+    "Skin packs",
     "Gaming videos",
     "YouTube shorts",
-    "Custom images",
-    "Community posts",
+    "Future projects",
+    "Channel updates",
   ],
   projects: [
     {
       title: "Minute to Win it: Minecraft Edition",
       category: "Creations",
       year: "Coming Soon",
+      createdYear: 2025,
+      isComingSoon: true,
       description:
         "Race against the clock in a collection of fast-paced 60-second Minecraft challenges inspired by Minute to Win It.",
       link: "/creations/minute-to-win-it/",
@@ -35,7 +37,8 @@ const siteData = {
     {
       title: "Diamond rush",
       category: "Creations",
-      year: "2026",
+      year: "2018",
+      createdYear: 2018,
       description:
         "Diamond Rush is an intense minigame where you have to mine as many diamond ores as you can and then smelt them to get diamonds.",
       link: "/creations/diamond-rush/",
@@ -44,7 +47,8 @@ const siteData = {
     {
       title: "X-Run Alpha",
       category: "Creations",
-      year: "2026",
+      year: "2020",
+      createdYear: 2020,
       description:
         "Speed Parkour where you have speed 25 or so, then you need to complete it without falling of the edge or getting trolled? can you do it? will you fail? find out now by Downloading Above",
       link: "/creations/x-run-alpha/",
@@ -53,7 +57,9 @@ const siteData = {
     {
       title: "Monkey Skin Pack",
       category: "Skin Packs",
-      year: "2026",
+      year: "2019",
+      createdYear: 2019,
+      lastUpdatedYear: 2021,
       description:
         "Have you ever wanted to be a monkey in Minecraft? Well, here's your chance with Santa Claus monkey, Easter monkey, dab police monkey and many others! Download it and try it out!",
       link: "/creations/monkey-skin-pack/",
