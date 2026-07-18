@@ -476,28 +476,35 @@ main {
 .world-release {
   position: relative;
   display: grid;
-  width: min(1180px, calc(100% - 64px));
-  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
-  align-items: center;
+  z-index: 4;
+  width: 100%;
+  height: 230px;
+  align-items: stretch;
   overflow: hidden;
-  gap: 56px;
-  margin: 56px auto 20px;
-  padding: 46px;
-  border: 1px solid rgba(20, 226, 216, 0.24);
-  border-radius: 8px;
+  isolation: isolate;
+  margin: -24px auto 0;
+  border: 0;
+  border-block: 1px solid rgba(20, 226, 216, 0.26);
+  border-radius: 0;
   background:
-    linear-gradient(112deg, rgba(20, 226, 216, 0.12), transparent 36%),
-    linear-gradient(145deg, #101b27, #0a121c 68%);
-  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.28);
+    linear-gradient(90deg, #07101a 0%, #050a10 48%, #07111a 100%);
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.28),
+    inset 0 1px rgba(255, 255, 255, 0.025);
+  transition:
+    border-color 360ms ease,
+    box-shadow 520ms ease,
+    transform 520ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .world-release::before {
   position: absolute;
   top: 0;
   left: 0;
-  width: 42%;
+  z-index: 3;
+  width: 100%;
   height: 3px;
-  background: linear-gradient(90deg, var(--cyan), var(--green), transparent);
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--green), transparent);
   content: "";
   transform-origin: left;
 }
@@ -506,99 +513,186 @@ main {
   position: absolute;
   top: 0;
   right: 0;
-  width: 34%;
+  z-index: 1;
+  width: 56%;
   height: 100%;
   pointer-events: none;
-  background: linear-gradient(135deg, transparent 46%, rgba(20, 226, 216, 0.055));
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(5, 9, 15, 0.28) 18%, rgba(5, 9, 15, 0.82) 62%, rgba(5, 9, 15, 0.96) 100%),
+    linear-gradient(180deg, rgba(20, 226, 216, 0.1), transparent 44%);
   content: "";
+  transition: opacity 420ms ease;
 }
 
 .world-release-scene {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 0;
   display: grid;
+  width: 43%;
+  height: 100%;
   overflow: hidden;
-  aspect-ratio: 16 / 10;
+  box-sizing: border-box;
+  padding: 14px;
   place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 6px;
-  background: #101923;
-  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.34);
-  transition: border-color 220ms ease, transform 220ms ease;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(20, 226, 216, 0.16), transparent 32%),
+    #060a10;
+}
+
+.world-release-scene::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    108deg,
+    transparent 26%,
+    rgba(255, 255, 255, 0.04) 42%,
+    rgba(20, 226, 216, 0.18) 50%,
+    rgba(255, 255, 255, 0.04) 58%,
+    transparent 74%
+  );
+  content: "";
+  opacity: 0;
+  transform: translateX(-115%);
 }
 
 .world-release-scene img {
-  width: 100%;
-  height: 100%;
+  width: calc(100% - 28px);
+  height: 202px;
   object-fit: contain;
+  object-position: left center;
   filter: saturate(0.96) contrast(1.02);
-  transition: filter 220ms ease;
+  transition: filter 220ms ease, transform 520ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .world-release-scene:hover img {
   filter: saturate(1.06) contrast(1.03);
-}
-
-.world-release-scene:hover {
-  border-color: rgba(20, 226, 216, 0.56);
-  transform: translateY(-2px);
+  transform: scale(1.006);
 }
 
 .world-release-shade {
-  display: none;
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  height: 42%;
+  pointer-events: none;
+  background: linear-gradient(0deg, rgba(4, 8, 13, 0.82), transparent);
 }
 
 .world-release-copy {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
-  width: auto;
-  max-width: 500px;
+  width: min(720px, 56%);
+  min-width: 0;
+  grid-template-columns: auto minmax(120px, 1fr) auto;
   align-content: center;
+  align-items: center;
+  column-gap: 14px;
+  justify-self: end;
   margin: 0;
-  padding: 0;
+  padding: 18px 48px 18px 24px;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.76);
+}
+
+.world-release-copy .eyebrow,
+.world-release-copy h2,
+.world-release-copy p:not(.eyebrow) {
+  grid-column: 1 / -1;
+}
+
+.world-release-copy .eyebrow {
+  margin-bottom: 4px;
 }
 
 .world-release-copy h2 {
-  max-width: 500px;
-  margin-bottom: 18px;
-  font-size: 3.55rem;
-  line-height: 0.94;
+  max-width: 660px;
+  margin-bottom: 6px;
+  font-size: 2.12rem;
+  line-height: 0.98;
+  overflow-wrap: break-word;
+  transition: color 320ms ease, text-shadow 320ms ease, transform 420ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .world-release-copy h2 span {
+  display: inline;
+  margin-top: 0;
   color: var(--cyan);
+  font-size: 0.84em;
+  text-transform: uppercase;
+}
+
+.world-release-copy h2 span::before {
+  color: var(--ink);
+  content: " — ";
 }
 
 .world-release-copy p:not(.eyebrow) {
-  max-width: 540px;
+  max-width: 600px;
+  margin-bottom: 8px;
   color: #d8e1e7;
-  font-size: 1.08rem;
+  font-size: 0.96rem;
+  line-height: 1.5;
+  overflow-wrap: break-word;
 }
 
 .world-release-copy .mini-progress {
-  max-width: 420px;
-  margin: 8px 0 24px;
+  width: 100%;
+  max-width: 220px;
+  margin: 0;
+}
+
+.world-release-copy .progress-track {
+  width: 100%;
 }
 
 .world-release-copy .button {
-  justify-self: start;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  justify-self: end;
+  min-height: 42px;
+  padding-inline: 18px;
   border-radius: 2px;
   box-shadow: 0 12px 30px rgba(20, 226, 216, 0.15);
+  cursor: pointer;
+  transition:
+    color 260ms ease,
+    background 320ms ease,
+    border-color 260ms ease,
+    box-shadow 360ms ease,
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.world-release-copy .button::after {
+  position: absolute;
+  inset: -60% auto -60% -45%;
+  z-index: 0;
+  width: 34%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transform: skewX(-18deg) translateX(-180%);
 }
 
 .world-release-copy .announcement-badge {
   position: static;
   justify-self: start;
-  margin-top: 8px;
+  margin-top: 0;
   border-left: 3px solid var(--cyan);
   border-radius: 2px;
-  background: rgba(20, 226, 216, 0.12);
+  background: rgba(20, 226, 216, 0.16);
+  box-shadow: 0 0 0 1px rgba(20, 226, 216, 0.14);
 }
 
 .world-release.reveal-item::before {
   transform: scaleX(0);
-  transition: transform 620ms 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition:
+    transform 1400ms 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 360ms ease,
+    box-shadow 360ms ease;
 }
 
 .world-release.reveal-item.is-visible::before {
@@ -1034,6 +1128,155 @@ main {
 .creation-store .reveal-item.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* The featured announcement reveals as one composed moment instead of a generic card lift. */
+.home-world .world-release.reveal-item {
+  opacity: 0;
+  transform: translateY(46px) scale(0.975);
+  transition:
+    opacity 1100ms ease,
+    transform 1700ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 360ms ease,
+    box-shadow 520ms ease;
+}
+
+.home-world .world-release.reveal-item.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.world-release.reveal-item .world-release-scene img {
+  opacity: 0.45;
+  transform: scale(0.94);
+  filter: saturate(0.72) contrast(0.94);
+  transition:
+    opacity 1500ms 180ms ease,
+    filter 1900ms 120ms ease,
+    transform 2200ms 120ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.world-release.reveal-item.is-visible .world-release-scene img {
+  opacity: 1;
+  transform: scale(1);
+  filter: saturate(0.96) contrast(1.02);
+}
+
+.world-release.reveal-item .world-release-scene::after {
+  opacity: 0.7;
+  transform: translateX(-115%);
+  transition: transform 1800ms 360ms cubic-bezier(0.16, 1, 0.3, 1), opacity 420ms 1840ms ease;
+}
+
+.world-release.reveal-item.is-visible .world-release-scene::after {
+  opacity: 0;
+  transform: translateX(115%);
+}
+
+.world-release.reveal-item .world-release-copy > * {
+  opacity: 0;
+  transform: translateX(34px);
+  transition: opacity 900ms ease, transform 1100ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.world-release.reveal-item.is-visible .world-release-copy > * {
+  animation: world-release-copy-in 1100ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.world-release.reveal-item.is-visible .world-release-copy > :nth-child(1) {
+  animation-delay: 620ms;
+}
+
+.world-release.reveal-item.is-visible .world-release-copy > :nth-child(2) {
+  animation-delay: 760ms;
+}
+
+.world-release.reveal-item.is-visible .world-release-copy > :nth-child(3) {
+  animation-delay: 900ms;
+}
+
+.world-release.reveal-item.is-visible .world-release-copy > :nth-child(4) {
+  animation-delay: 1040ms;
+}
+
+.world-release.reveal-item.is-visible .world-release-copy > :nth-child(5) {
+  animation-delay: 1160ms;
+}
+
+.world-release.reveal-item.is-visible .world-release-copy > :nth-child(6) {
+  animation-delay: 1280ms;
+}
+
+@keyframes world-release-copy-in {
+  from {
+    opacity: 0;
+    transform: translateX(34px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .home-world .world-release.reveal-item.is-visible:hover {
+    border-color: rgba(20, 226, 216, 0.86);
+    box-shadow:
+      0 50px 120px rgba(0, 0, 0, 0.5),
+      0 0 58px rgba(20, 226, 216, 0.2);
+    transform: translateY(-8px) scale(1);
+  }
+
+  .world-release:hover::before {
+    filter: brightness(1.45);
+    box-shadow: 0 0 18px rgba(20, 226, 216, 0.62);
+  }
+
+  .home-world .world-release.reveal-item.is-visible:hover .world-release-scene img {
+    filter: saturate(1.14) contrast(1.06) brightness(1.03);
+    transform: scale(1.035);
+  }
+
+  .home-world .world-release.reveal-item.is-visible:hover::after {
+    opacity: 0.84;
+  }
+
+  .home-world .world-release.reveal-item.is-visible:hover .world-release-scene::after {
+    opacity: 0.48;
+    transform: translateX(115%);
+    transition: transform 900ms cubic-bezier(0.2, 0.7, 0.2, 1), opacity 260ms ease;
+  }
+
+  .home-world .world-release.reveal-item.is-visible:hover .world-release-copy h2 {
+    text-shadow: 0 0 34px rgba(20, 226, 216, 0.28), 0 2px 16px rgba(0, 0, 0, 0.76);
+    transform: translateX(-8px);
+  }
+
+  .home-world .world-release.reveal-item.is-visible:hover .world-release-copy .button {
+    border-color: rgba(147, 255, 89, 0.72);
+    box-shadow: 0 18px 40px rgba(20, 226, 216, 0.28);
+    transform: translateX(7px) translateY(-2px);
+  }
+
+  .home-world .world-release.reveal-item.is-visible:hover .world-release-copy .button:hover,
+  .home-world .world-release.reveal-item.is-visible:hover .world-release-copy .button:focus-visible {
+    border-color: rgba(201, 255, 173, 0.96);
+    background: linear-gradient(135deg, #93ff59, #41f0d4);
+    box-shadow:
+      0 22px 48px rgba(20, 226, 216, 0.38),
+      0 0 0 4px rgba(20, 226, 216, 0.14);
+    transform: translateX(10px) translateY(-6px) scale(1.045);
+  }
+
+  .home-world .world-release.reveal-item.is-visible:hover .world-release-copy .button:hover::after,
+  .home-world .world-release.reveal-item.is-visible:hover .world-release-copy .button:focus-visible::after {
+    opacity: 0.82;
+    transform: skewX(-18deg) translateX(520%);
+    transition: transform 720ms cubic-bezier(0.2, 0.7, 0.2, 1), opacity 180ms ease;
+  }
 }
 
 .hero-text {
@@ -2293,7 +2536,7 @@ textarea:focus {
   }
 
   .world-release-copy h2 {
-    font-size: 3rem;
+    font-size: 2rem;
   }
 
   .world-library-heading h2 {
@@ -2369,10 +2612,17 @@ textarea:focus {
   }
 
   .world-release {
-    width: calc(100% - 40px);
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.9fr);
-    gap: 32px;
-    padding: 32px;
+    width: 100%;
+    height: 240px;
+  }
+
+  .world-release-copy {
+    width: min(610px, 60%);
+    padding-right: 24px;
+  }
+
+  .world-release-scene img {
+    height: 212px;
   }
 
   .world-library-heading,
@@ -2603,7 +2853,7 @@ textarea:focus {
   }
 
   .world-hero-copy h1 {
-    font-size: 4.6rem;
+    font-size: 4rem;
   }
 
   .world-hero-copy .hero-text {
@@ -2611,22 +2861,85 @@ textarea:focus {
   }
 
   .world-release {
-    width: calc(100% - 28px);
-    grid-template-columns: 1fr;
-    gap: 28px;
-    margin-top: 32px;
-    padding: 20px;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin-top: 0;
+    min-height: 0;
+    background:
+      linear-gradient(180deg, #07101a, #080d14),
+      #060a10;
+  }
+
+  .world-release::after {
+    width: 100%;
+    height: 54%;
+    background: linear-gradient(0deg, rgba(5, 9, 15, 0.96), rgba(5, 9, 15, 0.76) 58%, transparent);
+  }
+
+  .world-release-scene {
+    position: relative;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 7;
+    padding: 10px;
+  }
+
+  .world-release-scene img {
+    width: calc(100% - 20px);
+    height: min(145px, calc(43.75vw - 20px));
+    object-position: center;
+  }
+
+  .world-release-shade {
+    display: none;
   }
 
   .world-release-copy {
     width: auto;
     max-width: none;
+    grid-template-columns: auto minmax(0, 1fr);
+    justify-self: stretch;
     margin: 0;
-    padding: 0;
+    padding: 16px 16px 18px;
   }
 
   .world-release-copy h2 {
-    font-size: 2.6rem;
+    max-width: 100%;
+    margin-bottom: 10px;
+    font-size: 1.7rem;
+    line-height: 0.98;
+  }
+
+  .world-release-copy h2 span {
+    display: block;
+  }
+
+  .world-release-copy h2 span::before {
+    content: "";
+  }
+
+  .world-release-copy p:not(.eyebrow),
+  .world-release-copy .mini-progress {
+    width: 100%;
+    max-width: none;
+    font-size: 0.94rem;
+  }
+
+  .world-release-copy .mini-progress {
+    grid-column: 2;
+    margin-bottom: 8px;
+  }
+
+  .world-release-copy .announcement-badge {
+    grid-column: 1;
+  }
+
+  .world-release-copy .button {
+    width: 100%;
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    margin-top: 2px;
   }
 
   .world-library {
@@ -3009,5 +3322,22 @@ textarea:focus {
   .reveal-item {
     opacity: 1;
     transform: none;
+  }
+
+  .home-world .world-release.reveal-item,
+  .home-world .world-release.reveal-item.is-visible,
+  .world-release.reveal-item .world-release-scene img,
+  .world-release.reveal-item.is-visible .world-release-scene img,
+  .world-release.reveal-item .world-release-copy > *,
+  .world-release.reveal-item.is-visible .world-release-copy > * {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .world-release.reveal-item .world-release-scene::after,
+  .world-release.reveal-item.is-visible .world-release-scene::after {
+    display: none;
   }
 }
