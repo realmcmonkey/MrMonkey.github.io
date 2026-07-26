@@ -230,8 +230,12 @@ const renderProjects = (category = currentProjectCategory, sortMode = currentPro
   if (!container) return;
   const limit = Number(container.dataset.projectLimit || 0);
   const isCompact = container.classList.contains("compact-creations");
+  const skipUpcoming = container.dataset.projectSkipUpcoming === "true";
   const projects = sortProjects(siteData.projects.filter(
-    (project) => category === "All" || project.category === category,
+    (project) => (
+      (category === "All" || project.category === category)
+      && (!skipUpcoming || !project.isComingSoon)
+    ),
   ), sortMode).slice(0, limit || undefined);
   container.innerHTML = "";
 
@@ -240,7 +244,9 @@ const renderProjects = (category = currentProjectCategory, sortMode = currentPro
     if (project.status) card.dataset.status = project.status;
     if (project.isComingSoon) card.dataset.upcoming = "true";
 
-    const media = createElement("div", "project-media");
+    const media = createElement("a", "project-media");
+    setLinkTarget(media, project.link);
+    media.setAttribute("aria-label", `View ${project.title}`);
 
     if (project.image) {
       const image = createElement("img");
@@ -773,11 +779,15 @@ const setupNavigation = () => {
   const closeNav = () => {
     nav.classList.remove("is-open");
     toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "Open navigation");
+    document.body.classList.remove("nav-open");
   };
 
   toggle.addEventListener("click", () => {
     const isOpen = nav.classList.toggle("is-open");
     toggle.setAttribute("aria-expanded", String(isOpen));
+    toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation");
+    document.body.classList.toggle("nav-open", isOpen);
   });
 
   $$(".site-nav a").forEach((link) => {
@@ -790,6 +800,44 @@ const setupNavigation = () => {
     if (nav.contains(event.target) || toggle.contains(event.target)) return;
     closeNav();
   });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && nav.classList.contains("is-open")) {
+      closeNav();
+      toggle.focus();
+    }
+  });
+};
+
+const setupHeaderBehavior = () => {
+  const header = $(".site-header");
+  if (!header) return;
+  let previousScroll = window.scrollY;
+  let ticking = false;
+
+  const updateHeader = () => {
+    const currentScroll = window.scrollY;
+    const navIsOpen = $(".site-nav")?.classList.contains("is-open");
+    const scrollingDown = currentScroll > previousScroll + 5;
+    const scrollingUp = currentScroll < previousScroll - 5;
+
+    if (!navIsOpen && scrollingDown && currentScroll > 150) {
+      header.classList.add("header-hidden");
+    } else if (scrollingUp || currentScroll < 80 || navIsOpen) {
+      header.classList.remove("header-hidden");
+    }
+
+    previousScroll = currentScroll;
+    ticking = false;
+  };
+
+  window.addEventListener("scroll", () => {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(updateHeader);
+  }, { passive: true });
+
+  $(".nav-toggle")?.addEventListener("click", () => header.classList.remove("header-hidden"));
 };
 
 const markActivePage = () => {
@@ -855,21 +903,24 @@ const setupScrollReveals = () => {
     [
       ".video-card",
       ".playlist-card",
-      ".feature-grid article",
       ".project-gallery img",
       ".project-image-stack img",
       ".development-progress",
       ".download-panel",
       ".contact-form",
-      ".about-visual",
-      ".about-story-panel",
-      ".world-release",
-      ".home-world .project-card",
-      ".world-onward",
-      ".creation-store .project-card",
+      ".home-reveal-feature",
+      ".featured-projects .project-card",
+      ".home-media",
+      ".home-story-preview",
+      ".home-final-cta",
+      ".project-library .project-card",
       ".story-timeline-entry",
       ".story-era-divider",
-      ".skill-panel",
+      ".release-hero-art",
+      ".release-facts",
+      ".release-description",
+      ".story-closing",
+      ".contact-highlights div",
       ".not-found-content",
     ].join(","),
   );
@@ -889,7 +940,7 @@ const setupScrollReveals = () => {
         observer.unobserve(entry.target);
       });
     },
-    { rootMargin: "0px 0px -10% 0px", threshold: 0.12 },
+    { rootMargin: "0px 0px -4% 0px", threshold: 0.08 },
   );
   items.forEach((item) => observer.observe(item));
 };
@@ -1015,6 +1066,7 @@ const setupStoryChapters = () => {
 hydrateSite();
 rewriteStaticInternalLinks();
 setupNavigation();
+setupHeaderBehavior();
 markActivePage();
 setupSubscribeWidget();
 setupScrollReveals();
