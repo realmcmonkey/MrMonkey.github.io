@@ -47,6 +47,7 @@ const projectFilterParam = {
   All: "all",
   Creations: "creations",
   "Skin Packs": "skin-packs",
+  "Personal Worlds": "personal-worlds",
 };
 
 const projectCategoryFromParam = (value) => (
@@ -220,6 +221,11 @@ const getProjectSortValue = (project, sortMode) => {
 const sortProjects = (projects, sortMode) => [...projects].sort((first, second) => {
   if (first.isComingSoon && !second.isComingSoon) return -1;
   if (!first.isComingSoon && second.isComingSoon) return 1;
+  if (first.isTemplatePreview && !second.isTemplatePreview) return -1;
+  if (!first.isTemplatePreview && second.isTemplatePreview) return 1;
+  if (first.isTemplatePreview && second.isTemplatePreview) {
+    return Number(second.templateOrder || 0) - Number(first.templateOrder || 0);
+  }
   const dateDifference = getProjectSortValue(second, sortMode) - getProjectSortValue(first, sortMode);
   if (dateDifference) return dateDifference;
   return first.title.localeCompare(second.title);
@@ -231,10 +237,12 @@ const renderProjects = (category = currentProjectCategory, sortMode = currentPro
   const limit = Number(container.dataset.projectLimit || 0);
   const isCompact = container.classList.contains("compact-creations");
   const skipUpcoming = container.dataset.projectSkipUpcoming === "true";
+  const skipTemplates = container.dataset.projectSkipTemplates === "true";
   const projects = sortProjects(siteData.projects.filter(
     (project) => (
       (category === "All" || project.category === category)
       && (!skipUpcoming || !project.isComingSoon)
+      && (!skipTemplates || !project.isTemplatePreview)
     ),
   ), sortMode).slice(0, limit || undefined);
   container.innerHTML = "";
@@ -262,6 +270,8 @@ const renderProjects = (category = currentProjectCategory, sortMode = currentPro
 
     if (project.isComingSoon) {
       media.append(createElement("span", "project-media-badge", "Coming Soon"));
+    } else if (project.isTemplatePreview) {
+      media.append(createElement("span", "project-media-badge template-badge", "Template Preview"));
     }
 
     card.append(media);
@@ -269,7 +279,7 @@ const renderProjects = (category = currentProjectCategory, sortMode = currentPro
     const body = createElement("div", "card-body");
     const dateMeta = project.isComingSoon
       ? "Coming Soon"
-      : `Created ${project.year}`;
+      : (project.dateLabel || `Created ${project.year}`);
     const updatedMeta = project.lastUpdatedYear ? ` | Updated ${project.lastUpdatedYear}` : "";
     const meta = createElement("p", "card-meta", `${project.category} | ${dateMeta}${updatedMeta}`);
     const title = createElement("h3", "", project.title);
@@ -296,7 +306,7 @@ const renderProjects = (category = currentProjectCategory, sortMode = currentPro
       track.append(fill);
       progress.append(label, track);
     }
-    const link = createElement("a", "text-link", project.status ? "Coming soon" : "View project");
+    const link = createElement("a", "button secondary project-action", project.status ? "Coming soon" : "View project");
     if (project.status) {
       link.href = "#";
       link.setAttribute("aria-disabled", "true");
@@ -318,11 +328,12 @@ const renderFilters = () => {
   if (!filters) return;
   const heading = $("[data-project-heading]");
   const sortControl = $("[data-project-sort]");
-  const headings = {
-    All: "Creations",
-    Creations: "Maps and Games",
-    "Skin Packs": "Skin Packs",
-  };
+    const headings = {
+      All: "Creations",
+      Creations: "Maps and Games",
+      "Skin Packs": "Skin Packs",
+      "Personal Worlds": "Personal Worlds",
+    };
   const categories = ["All", ...new Set(siteData.projects.map((project) => project.category))];
   const savedControls = readProjectControls();
   if (categories.includes(savedControls.category)) {
@@ -400,7 +411,7 @@ const renderVideos = () => {
     }
 
     const body = createElement("div", "card-body");
-    const action = createElement("a", "text-link", "Visit channel");
+    const action = createElement("a", "button secondary", "Visit channel");
     setLinkTarget(action, video.url || siteData.youtubeChannel);
     body.append(createElement("h3", "", video.title), createElement("p", "", video.description), action);
     card.append(body);
@@ -1063,6 +1074,145 @@ const setupStoryChapters = () => {
   });
 };
 
+const setupImageGalleries = () => {
+  const galleries = $$("[data-image-gallery]");
+  if (!galleries.length) return;
+
+  const lightbox = createElement("div", "gallery-lightbox");
+  lightbox.hidden = true;
+  lightbox.setAttribute("role", "dialog");
+  lightbox.setAttribute("aria-modal", "true");
+  lightbox.setAttribute("aria-label", "Image viewer");
+
+  const closeButton = createElement("button", "gallery-lightbox-close", "\u00d7");
+  closeButton.type = "button";
+  closeButton.setAttribute("aria-label", "Close image viewer");
+  closeButton.title = "Close image viewer";
+
+  const previousButton = createElement("button", "gallery-lightbox-nav gallery-lightbox-prev", "\u2039");
+  previousButton.type = "button";
+  previousButton.setAttribute("aria-label", "Previous image");
+  previousButton.title = "Previous image";
+
+  const nextButton = createElement("button", "gallery-lightbox-nav gallery-lightbox-next", "\u203a");
+  nextButton.type = "button";
+  nextButton.setAttribute("aria-label", "Next image");
+  nextButton.title = "Next image";
+
+  const stage = createElement("figure", "gallery-lightbox-stage");
+  const image = createElement("img", "gallery-lightbox-image");
+  const caption = createElement("figcaption", "gallery-lightbox-caption");
+  const captionText = createElement("span", "gallery-lightbox-caption-text");
+  const counter = createElement("span", "gallery-lightbox-counter");
+  caption.append(captionText, counter);
+  stage.append(image, caption);
+  lightbox.append(closeButton, previousButton, stage, nextButton);
+  document.body.append(lightbox);
+
+  let activeItems = [];
+  let activeIndex = 0;
+  let lastTrigger = null;
+  let touchStartX = 0;
+  let closeTimer = null;
+
+  const updateImage = () => {
+    const item = activeItems[activeIndex];
+    if (!item) return;
+    const thumbnail = item.querySelector("img");
+    image.src = item.dataset.full || thumbnail?.currentSrc || thumbnail?.src || "";
+    image.alt = thumbnail?.alt || "";
+    captionText.textContent = item.dataset.caption || thumbnail?.alt || "";
+    counter.textContent = `${activeIndex + 1} / ${activeItems.length}`;
+    const hasMultipleImages = activeItems.length > 1;
+    previousButton.hidden = !hasMultipleImages;
+    nextButton.hidden = !hasMultipleImages;
+  };
+
+  const move = (direction) => {
+    if (activeItems.length < 2) return;
+    activeIndex = (activeIndex + direction + activeItems.length) % activeItems.length;
+    updateImage();
+  };
+
+  const finishClose = () => {
+    lightbox.hidden = true;
+    document.body.classList.remove("gallery-open");
+    image.removeAttribute("src");
+    if (lastTrigger) lastTrigger.focus();
+  };
+
+  const close = () => {
+    if (lightbox.hidden) return;
+    lightbox.classList.remove("is-open");
+    window.clearTimeout(closeTimer);
+    if (prefersReducedMotion()) {
+      finishClose();
+      return;
+    }
+    closeTimer = window.setTimeout(finishClose, 220);
+  };
+
+  const open = (gallery, item, trigger) => {
+    activeItems = Array.from(gallery.querySelectorAll("[data-gallery-item]"));
+    activeIndex = Math.max(0, activeItems.indexOf(item));
+    lastTrigger = trigger;
+    window.clearTimeout(closeTimer);
+    updateImage();
+    lightbox.hidden = false;
+    document.body.classList.add("gallery-open");
+    window.requestAnimationFrame(() => lightbox.classList.add("is-open"));
+    closeButton.focus();
+  };
+
+  galleries.forEach((gallery) => {
+    gallery.querySelectorAll("[data-gallery-item]").forEach((item) => {
+      item.addEventListener("click", () => open(gallery, item, item));
+    });
+  });
+
+  closeButton.addEventListener("click", close);
+  previousButton.addEventListener("click", () => move(-1));
+  nextButton.addEventListener("click", () => move(1));
+  lightbox.addEventListener("click", (event) => {
+    if (event.target === image || event.target.closest(".gallery-lightbox-close, .gallery-lightbox-nav")) {
+      return;
+    }
+    close();
+  });
+
+  stage.addEventListener("touchstart", (event) => {
+    touchStartX = event.changedTouches[0]?.clientX || 0;
+  }, { passive: true });
+
+  stage.addEventListener("touchend", (event) => {
+    const touchEndX = event.changedTouches[0]?.clientX || 0;
+    const distance = touchEndX - touchStartX;
+    if (Math.abs(distance) < 50) return;
+    move(distance > 0 ? -1 : 1);
+  }, { passive: true });
+
+  document.addEventListener("keydown", (event) => {
+    if (lightbox.hidden) return;
+    if (event.key === "Escape") {
+      close();
+    } else if (event.key === "ArrowLeft") {
+      move(-1);
+    } else if (event.key === "ArrowRight") {
+      move(1);
+    } else if (event.key === "Tab") {
+      const controls = [closeButton, previousButton, nextButton].filter((control) => !control.hidden);
+      const currentIndex = controls.indexOf(document.activeElement);
+      if (event.shiftKey && currentIndex <= 0) {
+        event.preventDefault();
+        controls[controls.length - 1].focus();
+      } else if (!event.shiftKey && currentIndex === controls.length - 1) {
+        event.preventDefault();
+        controls[0].focus();
+      }
+    }
+  });
+};
+
 hydrateSite();
 rewriteStaticInternalLinks();
 setupNavigation();
@@ -1072,5 +1222,6 @@ setupSubscribeWidget();
 setupScrollReveals();
 setupAnimatedDetails();
 setupStoryChapters();
+setupImageGalleries();
 setupProjectUrlControls();
 setupPageTransitions();

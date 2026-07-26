@@ -35,6 +35,28 @@ const siteData = {
       progress: 25,
     },
     {
+      title: "Monkey Land - Current Survival World",
+      category: "Personal Worlds",
+      dateLabel: "Ongoing",
+      isTemplatePreview: true,
+      templateOrder: 2,
+      description:
+        "My ongoing survival journey, featuring years of builds, exploration, and creativity—all completed without cheats.",
+      link: "/creations/current-survival-world/",
+      image: imageUrl("home-hero-minecraft.png"),
+    },
+    {
+      title: "Melon Survival - First Ever Survival World",
+      category: "Personal Worlds",
+      dateLabel: "Archived",
+      isTemplatePreview: true,
+      templateOrder: 1,
+      description:
+        "A preview of the archive page for my first Minecraft survival world, preserved as a time capsule of where my Minecraft journey began.",
+      link: "/creations/first-survival-world/",
+      image: imageUrl("home-hero-minecraft.png"),
+    },
+    {
       title: "Diamond rush",
       category: "Creations",
       year: "2018",
