@@ -2436,6 +2436,13 @@ body.is-leaving {
   }
 }
 
+@media (max-width: 1180px) and (orientation: landscape) {
+  .home-stage-mascot {
+    height: min(34vw, 320px, 52svh);
+    align-self: center;
+  }
+}
+
 @media (max-width: 860px) {
   :root {
     --header-height: 68px;
