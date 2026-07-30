@@ -2731,28 +2731,28 @@ body.is-leaving {
   }
 
   .home-stage-tagline {
-    margin-bottom: 0.8rem;
+    margin-bottom: 1.6rem;
   }
 
   .home-stage-mobile-logo {
+    position: absolute;
+    right: clamp(8px, 4vw, 20px);
+    bottom: clamp(18px, 5vw, 28px);
     display: block;
-    width: clamp(82px, 24vw, 100px);
+    width: clamp(76px, 23vw, 100px);
     height: auto;
-    align-self: center;
-    order: 4;
-    margin: 0 auto 0.9rem;
+    margin: 0;
+    pointer-events: none;
   }
 
   .home-stage .social-links {
-    align-self: center;
-    order: 5;
-    margin-bottom: 1rem;
+    align-self: flex-start;
+    margin-bottom: 0;
   }
 
   .home-stage-action {
-    align-self: center;
-    order: 6;
-    margin-bottom: 0;
+    align-self: flex-start;
+    margin-bottom: 1.5rem;
   }
 
   .home-stage-content h1 {
