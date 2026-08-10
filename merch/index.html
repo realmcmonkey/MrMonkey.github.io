@@ -1,45 +1,39 @@
 <!doctype html>
 <html lang="en">
   <head>
-    
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Minecraft creations, custom items, builds, and future downloads from Mr. Monkey."
+      content="Browse the official Mr. Monkey merch store, powered by Spring."
     />
-    <title>Creations | Mr. Monkey</title>
+    <title>Official Mr. Monkey Merch | Mr. Monkey</title>
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon-16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="48x48" href="../assets/images/favicon-48.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/apple-touch-icon.png" />
     <link rel="manifest" href="../site.webmanifest" />
-    <link rel="canonical" href="https://www.mrmonkey.ca/creations/" />
+    <link rel="canonical" href="https://www.mrmonkey.ca/merch/" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Creations | Mr. Monkey" />
+    <meta property="og:title" content="Official Mr. Monkey Merch" />
     <meta
       property="og:description"
-      content="Minecraft creations, custom items, builds, and future downloads from Mr. Monkey."
+      content="Official Mr. Monkey merch is here. Browse the store and see what’s available."
     />
-    <meta property="og:url" content="https://www.mrmonkey.ca/creations/" />
-    <meta
-      property="og:image"
-      content="https://www.mrmonkey.ca/assets/images/minute-to-win-it-minecraft-edition.png"
-    />
-    <meta property="og:image:alt" content="Mr. Monkey Minecraft creations preview" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Creations | Mr. Monkey" />
+    <meta property="og:url" content="https://www.mrmonkey.ca/merch/" />
+    <meta property="og:image" content="https://www.mrmonkey.ca/assets/images/mr-monkey-mascot.png" />
+    <meta property="og:image:alt" content="Mr. Monkey mascot" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Official Mr. Monkey Merch" />
     <meta
       name="twitter:description"
-      content="Minecraft creations, custom items, builds, and future downloads from Mr. Monkey."
+      content="Official Mr. Monkey merch is here. Browse the store and see what’s available."
     />
-    <meta
-      name="twitter:image"
-      content="https://www.mrmonkey.ca/assets/images/minute-to-win-it-minecraft-edition.png"
-    />
+    <meta name="twitter:image" content="https://www.mrmonkey.ca/assets/images/mr-monkey-mascot.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://embed.creator-spring.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
       rel="stylesheet"
@@ -67,31 +61,34 @@
       </nav>
     </header>
 
-    <main class="library-page">
-      <header class="library-opening">
-        <p class="eyebrow">Creations</p>
-        <h1>Minecraft creations</h1>
-        <p>Custom items, builds, maps, worlds, screenshots, and future downloads all live here.</p>
+    <main class="merch-page">
+      <header class="merch-opening">
+        <div class="merch-opening-copy">
+          <p class="eyebrow">Merch</p>
+          <h1>Official Mr. Monkey Merch</h1>
+          <p>Official Mr. Monkey merch is here. Browse the store and see what’s available.</p>
+        </div>
+        <img
+          src="../assets/images/mr-monkey-mascot.png"
+          alt="Mr. Monkey mascot"
+          width="1059"
+          height="1486"
+        />
       </header>
 
-      <section class="library-browser" aria-label="Project library">
-        <div class="library-controls">
-          <div class="library-controls-title">
-            <span>Browse</span>
-            <h2 data-project-heading>Creations</h2>
-          </div>
-          <div class="project-controls" aria-label="Creation browsing controls">
-            <div class="filters" aria-label="Portfolio filters" data-project-filters></div>
-            <label class="sort-control">
-              <span>Sort</span>
-              <select data-project-sort aria-label="Sort creations">
-                <option value="created">Newest Creations</option>
-                <option value="updated">Recently Updated</option>
-              </select>
-            </label>
-          </div>
+      <section class="merch-store" aria-label="Official Mr. Monkey merch store">
+        <p class="merch-store-note">The store and checkout are powered by Spring.</p>
+        <div class="spring-store-shell">
+          <iframe
+            class="spring-store-frame"
+            style="border-radius:7px;border:none"
+            src="https://embed.creator-spring.com/widget?slug=mr-monkeys-merch&amp;per=30&amp;currency=&amp;page=1&amp;layout=grid-sm-4&amp;theme=dark"
+            title="Official Mr. Monkey merch store powered by Spring"
+            width="100%"
+            height="960"
+            data-reactroot=""
+          ></iframe>
         </div>
-        <div class="project-library" data-projects></div>
       </section>
     </main>
 

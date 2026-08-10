@@ -923,7 +923,7 @@ const setupScrollReveals = () => {
       ".featured-projects .project-card",
       ".home-media",
       ".home-story-preview",
-      ".home-final-cta",
+      ".home-merch-feature",
       ".project-library .project-card",
       ".story-timeline-entry",
       ".story-era-divider",

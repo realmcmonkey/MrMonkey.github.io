@@ -840,33 +840,123 @@ strong {
   font-size: clamp(1.8rem, 3vw, 2.7rem);
 }
 
-.home-final-cta {
+.home-merch-feature {
   position: relative;
-  padding: clamp(30px, 3vw, 42px) max(20px, calc((100vw - var(--max)) / 2 + 72px));
+  padding: clamp(28px, 3vw, 40px) max(20px, calc((100vw - var(--max)) / 2 + 72px));
   overflow: hidden;
   border-top: 1px solid var(--line);
   background:
-    linear-gradient(90deg, rgba(53, 198, 215, 0.055), transparent 48%),
+    radial-gradient(circle at 78% 40%, rgba(53, 198, 215, 0.12), transparent 28%),
+    linear-gradient(90deg, rgba(53, 198, 215, 0.045), transparent 48%),
     var(--bg-raised);
 }
 
-.home-final-cta-inner {
+.home-merch-feature-inner {
   display: grid;
   max-width: var(--max);
-  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 210px;
+  grid-template-columns: minmax(0, 1fr) minmax(130px, 210px);
   align-items: center;
-  gap: 28px;
+  gap: clamp(24px, 5vw, 72px);
   margin: 0 auto;
 }
 
-.home-final-cta h2 {
+.home-merch-copy {
+  max-width: 720px;
+}
+
+.home-merch-feature h2 {
   margin-bottom: 0.65rem;
   font-size: clamp(1.8rem, 3vw, 2.6rem);
 }
 
-.home-final-cta p:not(.eyebrow) {
+.home-merch-feature p:not(.eyebrow) {
   max-width: 690px;
+  margin-bottom: 1.25rem;
+}
+
+.home-merch-feature img {
+  width: auto;
+  height: clamp(165px, 16vw, 210px);
+  justify-self: center;
+  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.3));
+}
+
+/* Merch */
+.merch-page {
+  min-height: calc(100svh - 100px);
+  padding-top: calc(var(--header-height) + 46px);
+}
+
+.merch-opening {
+  display: grid;
+  width: min(calc(100% - 40px), 1180px);
+  grid-template-columns: minmax(0, 1fr) minmax(130px, 190px);
+  align-items: center;
+  gap: clamp(24px, 5vw, 72px);
+  margin: 0 auto;
+  padding: clamp(38px, 6vw, 72px) 0 clamp(30px, 4vw, 48px);
+  border-bottom: 1px solid var(--line);
+}
+
+.merch-opening-copy {
+  max-width: 780px;
+}
+
+.merch-opening h1 {
+  margin-bottom: 1rem;
+  font-size: clamp(2.8rem, 5.5vw, 5.4rem);
+}
+
+.merch-opening-copy > p:last-child {
+  max-width: 620px;
   margin-bottom: 0;
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+}
+
+.merch-opening img {
+  width: auto;
+  height: clamp(170px, 18vw, 235px);
+  justify-self: center;
+  filter: drop-shadow(0 20px 28px rgba(0, 0, 0, 0.34));
+}
+
+.merch-store {
+  width: min(100%, 1580px);
+  margin: 0 auto;
+  padding: clamp(28px, 4vw, 52px) clamp(20px, 4vw, 56px) clamp(52px, 7vw, 92px);
+}
+
+.merch-store-note {
+  margin-bottom: 1rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.spring-store-shell {
+  position: relative;
+  min-height: 960px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--bg-deep);
+}
+
+.spring-store-shell::before {
+  position: absolute;
+  inset: 42px 0 auto;
+  color: var(--muted);
+  content: "Loading store...";
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.spring-store-frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 960px;
+  background: transparent;
 }
 
 /* Creations library */
@@ -2810,14 +2900,46 @@ body.is-leaving {
     grid-template-columns: 1fr;
   }
 
-  .home-media-copy,
-  .home-final-cta-inner {
+  .home-media-copy {
     grid-template-columns: 1fr;
   }
 
-  .home-media-copy .button,
-  .home-final-cta-inner .button {
+  .home-media-copy .button {
     width: 100%;
+  }
+
+  .home-merch-feature {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .home-merch-feature-inner {
+    min-height: 190px;
+    grid-template-columns: minmax(0, 1fr) 100px;
+    gap: 14px;
+  }
+
+  .home-merch-feature img {
+    height: 140px;
+  }
+
+  .merch-page {
+    padding-top: calc(var(--header-height) + 36px);
+  }
+
+  .merch-opening {
+    width: calc(100% - 40px);
+    grid-template-columns: minmax(0, 1fr) 96px;
+    gap: 14px;
+    padding-top: 42px;
+  }
+
+  .merch-opening h1 {
+    font-size: clamp(2.45rem, 12vw, 3.5rem);
+  }
+
+  .merch-opening img {
+    height: 125px;
   }
 
   .home-story-number {
@@ -3133,6 +3255,22 @@ body.is-leaving {
 }
 
 @media (max-width: 380px) {
+  .home-merch-feature-inner {
+    grid-template-columns: minmax(0, 1fr) 82px;
+  }
+
+  .home-merch-feature img {
+    height: 118px;
+  }
+
+  .merch-opening {
+    grid-template-columns: minmax(0, 1fr) 78px;
+  }
+
+  .merch-opening img {
+    height: 108px;
+  }
+
   .story-jump-links,
   .skin-list {
     grid-template-columns: 1fr;
