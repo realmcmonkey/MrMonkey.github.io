@@ -908,6 +908,195 @@ const setupSubscribeWidget = () => {
   window.setTimeout(syncFallback, 3000);
 };
 
+const setupSpringStore = () => {
+  const frame = $("[data-spring-store]");
+  if (!frame) return;
+
+  const shell = $("[data-spring-store-shell]");
+  const productStore = $("[data-spring-product-store]");
+  const productGrid = $("[data-spring-product-grid]");
+  const productStatus = $("[data-spring-product-status]");
+  const customStoreQuery = window.matchMedia("(max-width: 1080px)");
+  const storeOrigin = "https://mr-monkeys-merch.creator-spring.com";
+  const productApi = new URL("https://commerce.teespring.com/v1/stores/products");
+  let productsLoaded = false;
+  let productsLoading = false;
+
+  const configurations = [
+    {
+      key: "phone",
+      matches: () => window.innerWidth <= 680,
+      layout: "carousel-small",
+      products: 30,
+    },
+    {
+      key: "tablet",
+      matches: () => window.innerWidth <= 1080,
+      layout: "grid-sm-3",
+      products: 30,
+    },
+    {
+      key: "desktop",
+      matches: () => true,
+      layout: "grid-sm-4",
+      products: 30,
+    },
+  ];
+
+  const storeUrl = new URL("https://embed.creator-spring.com/widget");
+  storeUrl.searchParams.set("slug", "mr-monkeys-merch");
+  storeUrl.searchParams.set("currency", "");
+  storeUrl.searchParams.set("page", "1");
+  storeUrl.searchParams.set("theme", "dark");
+
+  productApi.searchParams.set("slug", "mr-monkeys-merch");
+  productApi.searchParams.set("page", "1");
+  productApi.searchParams.set("per", "30");
+  productApi.searchParams.set("region", "USA");
+  productApi.searchParams.set("currency", "USD");
+  productApi.searchParams.set("layout", "grid-sm-4");
+  productApi.searchParams.set("theme", "dark");
+
+  const connectResizer = () => {
+    if (typeof window.iFrameResize !== "function" || frame.iFrameResizer) return;
+    window.iFrameResize(
+      {
+        checkOrigin: ["https://embed.creator-spring.com"],
+        heightCalculationMethod: "lowestElement",
+        warningTimeout: 0,
+      },
+      frame,
+    );
+  };
+
+  const applyConfiguration = () => {
+    const configuration = configurations.find(({ matches }) => matches());
+    if (!configuration || frame.dataset.springConfiguration === configuration.key) return;
+
+    storeUrl.searchParams.set("per", String(configuration.products));
+    storeUrl.searchParams.set("layout", configuration.layout);
+    frame.dataset.springConfiguration = configuration.key;
+    frame.src = storeUrl.href;
+    connectResizer();
+  };
+
+  const showSkeletons = () => {
+    if (!productGrid) return;
+    productGrid.replaceChildren();
+    for (let index = 0; index < 6; index += 1) {
+      const skeleton = document.createElement("div");
+      skeleton.className = "merch-product-skeleton";
+      skeleton.setAttribute("aria-hidden", "true");
+      productGrid.append(skeleton);
+    }
+  };
+
+  const buildProductCard = (product) => {
+    const link = document.createElement("a");
+    const imageWrap = document.createElement("div");
+    const image = document.createElement("img");
+    const copy = document.createElement("div");
+    const name = document.createElement("p");
+    const type = document.createElement("p");
+    const price = document.createElement("p");
+    const productPath = typeof product.url === "string" ? product.url : "";
+
+    link.className = "merch-product-card";
+    link.href = new URL(`/listing${productPath}`, storeOrigin).href;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.setAttribute("aria-label", `View ${product.name} - ${product.productName} on Spring`);
+
+    imageWrap.className = "merch-product-image";
+    image.src = product.imageUrl;
+    image.alt = `${product.name} - ${product.productName}`;
+    image.width = 560;
+    image.height = 560;
+    image.loading = "lazy";
+    image.decoding = "async";
+    imageWrap.append(image);
+
+    copy.className = "merch-product-copy";
+    name.className = "merch-product-name";
+    name.textContent = product.name;
+    type.className = "merch-product-type";
+    type.textContent = product.productName;
+    price.className = "merch-product-price";
+    price.textContent = product.price;
+    copy.append(name, type, price);
+
+    link.append(imageWrap, copy);
+    return link;
+  };
+
+  const showOfficialFallback = () => {
+    if (productStore) productStore.hidden = true;
+    if (shell) shell.hidden = false;
+    applyConfiguration();
+  };
+
+  const loadProducts = async () => {
+    if (!productStore || !productGrid || !productStatus || productsLoaded || productsLoading) return;
+    productsLoading = true;
+    productStore.hidden = false;
+    productStore.setAttribute("aria-busy", "true");
+    productStatus.textContent = "Loading the latest products...";
+    showSkeletons();
+
+    try {
+      const response = await fetch(productApi.href, {
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) throw new Error(`Spring returned ${response.status}`);
+
+      const data = await response.json();
+      if (!Array.isArray(data.products) || !data.products.length) {
+        throw new Error("Spring returned no products");
+      }
+
+      const products = data.products.filter((product) => (
+        product
+        && typeof product.imageUrl === "string"
+        && typeof product.name === "string"
+        && typeof product.productName === "string"
+        && typeof product.price === "string"
+        && typeof product.url === "string"
+      ));
+      if (!products.length) throw new Error("Spring returned no usable products");
+
+      productGrid.replaceChildren(...products.map(buildProductCard));
+      productStatus.textContent = "";
+      productStore.setAttribute("aria-busy", "false");
+      productsLoaded = true;
+    } catch (error) {
+      console.warn("The branded Spring product grid could not load; using the official embed.", error);
+      showOfficialFallback();
+    } finally {
+      productsLoading = false;
+    }
+  };
+
+  const syncStorePresentation = () => {
+    if (customStoreQuery.matches) {
+      if (shell) shell.hidden = true;
+      if (productStore) productStore.hidden = false;
+      loadProducts();
+      return;
+    }
+
+    if (productStore) productStore.hidden = true;
+    if (shell) shell.hidden = false;
+    applyConfiguration();
+  };
+
+  let resizeTimer = 0;
+  syncStorePresentation();
+  window.addEventListener("resize", () => {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(syncStorePresentation, 180);
+  }, { passive: true });
+};
+
 const setupScrollReveals = () => {
   if (prefersReducedMotion()) return;
   const items = $$(
@@ -1219,6 +1408,7 @@ setupNavigation();
 setupHeaderBehavior();
 markActivePage();
 setupSubscribeWidget();
+setupSpringStore();
 setupScrollReveals();
 setupAnimatedDetails();
 setupStoryChapters();

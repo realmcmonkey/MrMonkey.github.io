@@ -78,14 +78,45 @@
 
       <section class="merch-store" aria-label="Official Mr. Monkey merch store">
         <p class="merch-store-note">The store and checkout are powered by Spring.</p>
-        <div class="spring-store-shell">
+        <div class="merch-product-store" data-spring-product-store hidden aria-busy="true">
+          <p class="merch-product-status" data-spring-product-status role="status">
+            Loading the latest products...
+          </p>
+          <div class="merch-product-grid" data-spring-product-grid></div>
+          <div class="merch-store-actions">
+            <a
+              class="button merch-full-store-button"
+              href="https://mr-monkeys-merch.creator-spring.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Full Spring Store
+            </a>
+            <a
+              class="merch-spring-brand"
+              href="https://mr-monkeys-merch.creator-spring.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Powered by Spring by Amaze"
+            >
+              <img
+                src="https://embed.creator-spring.com/poweredby_grey.svg"
+                alt="Powered by Spring by Amaze"
+                width="126"
+                height="24"
+              />
+            </a>
+          </div>
+        </div>
+        <div class="spring-store-shell" data-spring-store-shell>
           <iframe
             class="spring-store-frame"
+            data-spring-store
             style="border-radius:7px;border:none"
             src="https://embed.creator-spring.com/widget?slug=mr-monkeys-merch&amp;per=30&amp;currency=&amp;page=1&amp;layout=grid-sm-4&amp;theme=dark"
             title="Official Mr. Monkey merch store powered by Spring"
             width="100%"
-            height="960"
+            height="620"
             data-reactroot=""
           ></iframe>
         </div>
@@ -97,6 +128,11 @@
       <div class="footer-socials" data-footer-socials aria-label="Social links"></div>
     </footer>
 
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.1/iframeResizer.min.js"
+      integrity="sha512-ngVIPTfUxNHrVs52hA0CaOVwC3/do2W4jUEJIufgZQicmY27iAJAind8BPtK2LoyIGiAFcOkjO18r5dTUNLFAw=="
+      crossorigin="anonymous"
+    ></script>
     <script src="../assets/js/site-data.js"></script>
     <script src="../assets/js/script.js"></script>
   </body>
