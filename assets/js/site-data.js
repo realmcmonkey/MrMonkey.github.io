@@ -23,6 +23,17 @@ const siteData = {
   ],
   projects: [
     {
+      title: "Mr. Monkey Map Adverts",
+      category: "Add-ons",
+      dateLabel: "In Development",
+      libraryPriority: 100,
+      homeFeaturedOrder: 1,
+      description:
+        "Bring your Minecraft Bedrock maps to life with custom adverts and displays. Add extra detail to cities, stores, attractions and more with adverts designed for map creators.",
+      link: "/creations/map-adverts/",
+      image: imageUrl("map-adverts-display.jpg"),
+    },
+    {
       title: "Minute to Win it: Minecraft Edition",
       category: "Creations",
       year: "Coming Soon",
@@ -69,6 +80,7 @@ const siteData = {
     {
       title: "X-Run Alpha",
       category: "Creations",
+      homeFeaturedOrder: 2,
       year: "2020",
       createdYear: 2020,
       description:
@@ -79,6 +91,7 @@ const siteData = {
     {
       title: "Monkey Skin Pack",
       category: "Skin Packs",
+      homeFeaturedOrder: 3,
       year: "2019",
       createdYear: 2019,
       lastUpdatedYear: 2021,

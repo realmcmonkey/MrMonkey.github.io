@@ -46,6 +46,7 @@ let projectProgressHasAnimated = false;
 const projectFilterParam = {
   All: "all",
   Creations: "creations",
+  "Add-ons": "add-ons",
   "Skin Packs": "skin-packs",
   "Personal Worlds": "personal-worlds",
 };
@@ -221,6 +222,8 @@ const getProjectSortValue = (project, sortMode) => {
 const sortProjects = (projects, sortMode) => [...projects].sort((first, second) => {
   if (first.isComingSoon && !second.isComingSoon) return -1;
   if (!first.isComingSoon && second.isComingSoon) return 1;
+  const priorityDifference = Number(second.libraryPriority || 0) - Number(first.libraryPriority || 0);
+  if (priorityDifference) return priorityDifference;
   if (first.isTemplatePreview && !second.isTemplatePreview) return -1;
   if (!first.isTemplatePreview && second.isTemplatePreview) return 1;
   if (first.isTemplatePreview && second.isTemplatePreview) {
@@ -236,15 +239,27 @@ const renderProjects = (category = currentProjectCategory, sortMode = currentPro
   if (!container) return;
   const limit = Number(container.dataset.projectLimit || 0);
   const isCompact = container.classList.contains("compact-creations");
+  const isFeatured = container.classList.contains("featured-projects");
   const skipUpcoming = container.dataset.projectSkipUpcoming === "true";
   const skipTemplates = container.dataset.projectSkipTemplates === "true";
-  const projects = sortProjects(siteData.projects.filter(
+  let projects = sortProjects(siteData.projects.filter(
     (project) => (
       (category === "All" || project.category === category)
       && (!skipUpcoming || !project.isComingSoon)
       && (!skipTemplates || !project.isTemplatePreview)
+      && (!isFeatured || Number(project.homeFeaturedOrder || 0) > 0)
     ),
-  ), sortMode).slice(0, limit || undefined);
+  ), sortMode);
+  if (isFeatured) {
+    projects = projects.sort(
+      (first, second) => Number(first.homeFeaturedOrder) - Number(second.homeFeaturedOrder),
+    );
+  } else if (isCompact) {
+    projects = projects.sort(
+      (first, second) => Number(second.featuredPriority || 0) - Number(first.featuredPriority || 0),
+    );
+  }
+  projects = projects.slice(0, limit || undefined);
   container.innerHTML = "";
 
   projects.forEach((project) => {
@@ -264,7 +279,8 @@ const renderProjects = (category = currentProjectCategory, sortMode = currentPro
       media.append(image);
     } else {
       const teaser = createElement("div", "project-teaser");
-      teaser.innerHTML = "<span>Coming Soon</span>";
+      if (project.placeholderLabel) teaser.classList.add("project-placeholder");
+      teaser.append(createElement("span", "", project.placeholderLabel || "Coming Soon"));
       media.append(teaser);
     }
 
@@ -331,6 +347,7 @@ const renderFilters = () => {
     const headings = {
       All: "Creations",
       Creations: "Maps and Games",
+      "Add-ons": "Add-ons",
       "Skin Packs": "Skin Packs",
       "Personal Worlds": "Personal Worlds",
     };
