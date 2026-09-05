@@ -31,7 +31,7 @@ const siteData = {
       description:
         "Bring your Minecraft Bedrock maps to life with custom adverts and displays. Add extra detail to cities, stores, attractions and more with adverts designed for map creators.",
       link: "/creations/map-adverts/",
-      image: imageUrl("map-adverts-display.jpg"),
+      image: imageUrl("map-adverts-display.webp"),
     },
     {
       title: "Minute to Win it: Minecraft Edition",
@@ -42,7 +42,7 @@ const siteData = {
       description:
         "Race against the clock in a collection of fast-paced 60-second Minecraft challenges inspired by Minute to Win It.",
       link: "/creations/minute-to-win-it/",
-      image: imageUrl("minute-to-win-it-minecraft-edition.png"),
+      image: imageUrl("minute-to-win-it-minecraft-edition.webp"),
       progress: 25,
     },
     {
@@ -54,7 +54,7 @@ const siteData = {
       description:
         "My ongoing survival journey, featuring years of builds, exploration, and creativity—all completed without cheats.",
       link: "/creations/current-survival-world/",
-      image: imageUrl("home-hero-minecraft.png"),
+      image: imageUrl("home-hero-minecraft.webp"),
     },
     {
       title: "Melon Survival - First Ever Survival World",
@@ -65,7 +65,7 @@ const siteData = {
       description:
         "A preview of the archive page for my first Minecraft survival world, preserved as a time capsule of where my Minecraft journey began.",
       link: "/creations/first-survival-world/",
-      image: imageUrl("home-hero-minecraft.png"),
+      image: imageUrl("home-hero-minecraft.webp"),
     },
     {
       title: "Diamond rush",
@@ -75,7 +75,7 @@ const siteData = {
       description:
         "Diamond Rush is an intense minigame where you have to mine as many diamond ores as you can and then smelt them to get diamonds.",
       link: "/creations/diamond-rush/",
-      image: imageUrl("diamond-rush.png"),
+      image: imageUrl("diamond-rush.webp"),
     },
     {
       title: "X-Run Alpha",
@@ -86,7 +86,7 @@ const siteData = {
       description:
         "Speed Parkour where you have speed 25 or so, then you need to complete it without falling of the edge or getting trolled? can you do it? will you fail? find out now by Downloading Above",
       link: "/creations/x-run-alpha/",
-      image: imageUrl("x-run-alpha.png"),
+      image: imageUrl("x-run-alpha.webp"),
     },
     {
       title: "Monkey Skin Pack",
@@ -98,7 +98,7 @@ const siteData = {
       description:
         "Have you ever wanted to be a monkey in Minecraft? Well, here's your chance with Santa Claus monkey, Easter monkey, dab police monkey and many others! Download it and try it out!",
       link: "/creations/monkey-skin-pack/",
-      image: imageUrl("monkey-skin-pack.png"),
+      image: imageUrl("monkey-skin-pack.webp"),
     },
   ],
   videos: [
@@ -116,19 +116,19 @@ const siteData = {
       title: "Minecraft",
       description: "Minecraft videos, maps, builds, challenges, and Mr. Monkey creations.",
       url: "https://youtube.com/playlist?list=PLhqtivGUXKzxNefzFRGMRz7v_U4QJx21o&si=2NCnz6gvtjemd8Qb",
-      thumbnail: imageUrl("playlist-minecraft.png"),
+      thumbnail: imageUrl("playlist-minecraft.webp"),
     },
     {
       title: "Hytale",
       description: "Hytale videos, reactions, updates, and gameplay videos.",
       url: "https://youtube.com/playlist?list=PLhqtivGUXKzxP_NNA6X61icSR_UobQ-oS&si=UDdtMsOzfA3_zzKK",
-      thumbnail: imageUrl("playlist-hytale.png"),
+      thumbnail: imageUrl("playlist-hytale.webp"),
     },
     {
       title: "Roblox",
       description: "Roblox videos, games, funny moments, and extra channel variety.",
       url: "https://youtube.com/playlist?list=PLhqtivGUXKzzpq5m3mTrC7K5QFaxGo7qC&si=sPfIeM7osmsEfR4_",
-      thumbnail: imageUrl("playlist-roblox.png"),
+      thumbnail: imageUrl("playlist-roblox.webp"),
     },
   ],
   contactLinks: [

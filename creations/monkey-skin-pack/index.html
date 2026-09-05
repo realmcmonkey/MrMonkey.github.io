@@ -20,7 +20,7 @@
       content="A Minecraft Bedrock skin pack with costume skins including Santa, Easter, dab police, and more."
     />
     <meta property="og:url" content="https://www.mrmonkey.ca/creations/monkey-skin-pack/" />
-    <meta property="og:image" content="https://www.mrmonkey.ca/assets/images/monkey-skin-pack.png" />
+    <meta property="og:image" content="https://www.mrmonkey.ca/assets/images/monkey-skin-pack.webp" />
     <meta property="og:image:alt" content="Monkey Skin Pack Minecraft preview" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Monkey Skin Pack | Mr. Monkey" />
@@ -28,7 +28,7 @@
       name="twitter:description"
       content="A Minecraft Bedrock skin pack with costume skins including Santa, Easter, dab police, and more."
     />
-    <meta name="twitter:image" content="https://www.mrmonkey.ca/assets/images/monkey-skin-pack.png" />
+    <meta name="twitter:image" content="https://www.mrmonkey.ca/assets/images/monkey-skin-pack.webp" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -59,25 +59,23 @@
     </header>
 
     <main class="project-page project-skins">
-      <section class="release-hero">
-        <div class="release-hero-copy">
+      <section class="release-opening">
+        <a class="button secondary release-back-link" href="/creations/">Back to creations</a>
+        <div class="release-opening-heading">
+          <p class="eyebrow">Skin Pack</p>
           <h1>Monkey Skin Pack</h1>
         </div>
+        <figure class="release-primary-media">
+          <img src="../../assets/images/monkey-skin-pack.webp" alt="Monkey Skin Pack preview" />
+        </figure>
+        <p class="release-intro">
+          Have you ever wanted to be a monkey in Minecraft? Well, here's your chance with Santa
+          Claus monkey, Easter monkey, dab police monkey and many others! Download it and try it
+          out!
+        </p>
       </section>
 
-      <section class="project-introduction">
-        <a class="button secondary release-back-link" href="/creations/">Back to creations</a>
-        <div class="project-introduction-copy">
-          <p class="eyebrow">Skin Pack</p>
-          <p>
-            Have you ever wanted to be a monkey in Minecraft? Well, here's your chance with Santa
-            Claus monkey, Easter monkey, dab police monkey and many others! Download it and try it
-            out!
-          </p>
-        </div>
-      </section>
-
-      <section class="project-information-row">
+      <section class="release-main">
         <aside class="release-facts info-box skin-pack-information" aria-label="Skin pack information">
           <h2>Pack Information</h2>
           <dl>
@@ -91,35 +89,33 @@
             </div>
           </dl>
         </aside>
+        <div class="release-description">
+          <h2>Costume Lookbook</h2>
+        </div>
       </section>
 
       <section
-        class="release-gallery release-skins-gallery ordered-skin-gallery"
+        class="release-gallery skin-lookbook"
+        data-image-gallery
         aria-label="Monkey Skin Pack costume previews"
       >
-        <img
-          src="../../assets/images/monkey-skin-pack-costumes-1.png"
-          alt="Monkey Skin Pack first row of costume skins"
-        />
-        <img
-          src="../../assets/images/monkey-skin-pack-costumes-2.png"
-          alt="Monkey Skin Pack second row of costume skins"
-        />
-        <div class="release-description">
-          <p>
-            These ones (image above and below) are the costume ones (except the last one in the
-            image below that is the normal one).
-          </p>
-        </div>
-        <img
-          src="../../assets/images/monkey-skin-pack-costumes-3.png"
-          alt="Monkey Skin Pack third row of costume skins"
-        />
+        <button class="gallery-item" type="button" data-gallery-item data-caption="Monkey Skin Pack costume skins, row one">
+          <img src="../../assets/images/monkey-skin-pack-costumes-1.webp" alt="Monkey Skin Pack first row of costume skins" />
+        </button>
+        <button class="gallery-item" type="button" data-gallery-item data-caption="Monkey Skin Pack costume skins, row two">
+          <img src="../../assets/images/monkey-skin-pack-costumes-2.webp" alt="Monkey Skin Pack second row of costume skins" />
+        </button>
+        <p class="lookbook-note">
+          These ones (image above and below) are the costume ones (except the last one in the
+          image below that is the normal one).
+        </p>
+        <button class="gallery-item" type="button" data-gallery-item data-caption="Monkey Skin Pack costume skins, row three">
+          <img src="../../assets/images/monkey-skin-pack-costumes-3.webp" alt="Monkey Skin Pack third row of costume skins" />
+        </button>
       </section>
 
-      <section class="release-end">
-        <div class="skin-list-panel">
-          <h2>Included Skins:</h2>
+      <section class="skin-roster">
+        <h2>Included Skins:</h2>
           <ol class="skin-list">
             <li>Casual Monkey</li>
             <li>Casual Monkey 2</li>
@@ -140,7 +136,9 @@
             <li>Nike Monkey (Without Headphones)</li>
             <li>Chicken Onsie Monkey</li>
           </ol>
-        </div>
+      </section>
+
+      <section class="release-end">
         <details class="changelog-box animated-details" aria-label="Monkey Skin Pack changelog">
           <summary>Changelog</summary>
           <div class="changelog-content">

@@ -262,7 +262,7 @@ const renderProjects = (category = currentProjectCategory, sortMode = currentPro
   projects = projects.slice(0, limit || undefined);
   container.innerHTML = "";
 
-  projects.forEach((project) => {
+  projects.forEach((project, index) => {
     const card = createElement("article", "project-card");
     if (project.status) card.dataset.status = project.status;
     if (project.isComingSoon) card.dataset.upcoming = "true";
@@ -998,7 +998,7 @@ const setupSpringStore = () => {
   };
 
   const showSkeletons = () => {
-    if (!productGrid) return;
+    if (!productGrid || !productGrid.isConnected) return;
     productGrid.replaceChildren();
     for (let index = 0; index < 6; index += 1) {
       const skeleton = document.createElement("div");
@@ -1047,6 +1047,7 @@ const setupSpringStore = () => {
   };
 
   const showOfficialFallback = () => {
+    if (!document.documentElement.contains(productStore) && !document.documentElement.contains(shell)) return;
     if (productStore) productStore.hidden = true;
     if (shell) shell.hidden = false;
     applyConfiguration();
@@ -1080,6 +1081,8 @@ const setupSpringStore = () => {
         && typeof product.url === "string"
       ));
       if (!products.length) throw new Error("Spring returned no usable products");
+
+      if (!productStore.isConnected || !productGrid.isConnected || !productStatus.isConnected) return;
 
       productGrid.replaceChildren(...products.map(buildProductCard));
       productStatus.textContent = "";
@@ -1133,7 +1136,6 @@ const setupScrollReveals = () => {
       ".project-library .project-card",
       ".story-timeline-entry",
       ".story-era-divider",
-      ".release-hero-art",
       ".release-facts",
       ".release-description",
       ".story-closing",
