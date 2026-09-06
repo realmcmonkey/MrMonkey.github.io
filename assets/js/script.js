@@ -21,11 +21,21 @@ const externalTarget = (link) => {
 const siteRootUrl = new URL("../../", document.currentScript.src);
 
 const resolveLocalUrl = (href) => {
-  if (window.location.protocol !== "file:" || !href || !href.startsWith("/")) return href;
-  const cleanPath = href.split("#")[0].split("?")[0];
-  const suffix = cleanPath === "/" ? "index.html" : `${cleanPath.replace(/^\/+/, "")}${cleanPath.endsWith("/") ? "index.html" : ""}`;
-  const hash = href.includes("#") ? `#${href.split("#").slice(1).join("#")}` : "";
-  return new URL(suffix, siteRootUrl).href + hash;
+  if (!href || !href.startsWith("/")) return href;
+
+  if (window.location.protocol === "file:") {
+    const cleanPath = href.split("#")[0].split("?")[0];
+    const suffix = cleanPath === "/" ? "index.html" : `${cleanPath.replace(/^\/+/, "")}${cleanPath.endsWith("/") ? "index.html" : ""}`;
+    const hash = href.includes("#") ? `#${href.split("#").slice(1).join("#")}` : "";
+    return new URL(suffix, siteRootUrl).href + hash;
+  }
+
+  const previewRoot = siteRootUrl.pathname.replace(/\/$/, "");
+  if (siteRootUrl.origin === window.location.origin && previewRoot) {
+    return href === "/" ? siteRootUrl.href : new URL(href.slice(1), siteRootUrl).href;
+  }
+
+  return href;
 };
 
 const setLinkTarget = (anchor, href) => {
@@ -763,9 +773,10 @@ const setupContactForm = () => {
 };
 
 const rewriteStaticInternalLinks = () => {
-  if (window.location.protocol !== "file:") return;
   $$("a[href^='/']").forEach((link) => {
-    link.href = resolveLocalUrl(link.getAttribute("href"));
+    const href = link.getAttribute("href");
+    const resolvedHref = resolveLocalUrl(href);
+    if (resolvedHref !== href) link.href = resolvedHref;
   });
 };
 
@@ -869,12 +880,13 @@ const setupHeaderBehavior = () => {
 };
 
 const markActivePage = () => {
-  const cleanFilePath = (urlValue) => {
+  const cleanSitePath = (urlValue) => {
     const url = new URL(urlValue, window.location.href);
-    if (url.protocol !== "file:") return url.pathname;
     const rootPath = siteRootUrl.pathname.replace(/\/$/, "");
     const path = url.pathname;
-    const relative = path.startsWith(rootPath) ? path.slice(rootPath.length) : path;
+    const relative = (url.protocol === "file:" || url.origin === siteRootUrl.origin) && rootPath && path.startsWith(rootPath)
+      ? path.slice(rootPath.length)
+      : path;
     return relative.replace(/index\.html$/, "") || "/";
   };
   const normalizePath = (path) => {
@@ -882,13 +894,11 @@ const markActivePage = () => {
     return path.endsWith("/") ? path : `${path}/`;
   };
   const currentPath = normalizePath(
-    window.location.protocol === "file:" ? cleanFilePath(window.location.href) : window.location.pathname,
+    cleanSitePath(window.location.href),
   );
   const isCreationDetail = currentPath.startsWith("/creations/") && currentPath !== "/creations/";
   $$(".site-nav a").forEach((link) => {
-    const linkPath = normalizePath(
-      window.location.protocol === "file:" ? cleanFilePath(link.href) : link.getAttribute("href"),
-    );
+    const linkPath = normalizePath(cleanSitePath(link.href));
     if (linkPath === currentPath || (isCreationDetail && linkPath === "/creations/")) {
       link.setAttribute("aria-current", "page");
     }
