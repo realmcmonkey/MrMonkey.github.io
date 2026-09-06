@@ -289,9 +289,8 @@ h3 { font-size: clamp(1.18rem, 2vw, 1.52rem); }
 .split-project-title { display: grid; gap: 8px; }
 .split-project-title > span:first-child { font-size: 1em; }
 .split-project-title > span:last-child { color: var(--cyan-bright); font-size: 0.53em; letter-spacing: -0.025em; }
-.release-primary-media { position: relative; width: min(calc(100vw - 32px), 1320px); margin: clamp(22px, 4vw, 40px) 50% 0; overflow: hidden; background: #06111f; box-shadow: 0 28px 54px rgba(0, 0, 0, 0.28); transform: translateX(-50%); }
-.release-primary-media::after { position: absolute; z-index: 1; right: 0; bottom: 0; left: 0; height: clamp(42px, 9vw, 100px); background: linear-gradient(to bottom, rgba(6, 11, 22, 0), var(--ink)); content: ""; pointer-events: none; }
-.release-primary-media img { display: block; width: 100%; max-height: min(56vw, 660px); object-fit: contain; }
+.release-primary-media { width: min(100vw, 1440px); margin: clamp(22px, 4vw, 40px) 50% 0; background: #06111f; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3); transform: translateX(-50%); }
+.release-primary-media img { display: block; width: 100%; max-height: min(58vw, 700px); object-fit: contain; }
 .release-intro { max-width: 790px; margin: clamp(22px, 3vw, 32px) 0 0; color: #c8d5df; font-size: clamp(1rem, 1.5vw, 1.14rem); line-height: 1.74; }
 .release-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(210px, 0.31fr); gap: clamp(40px, 8vw, 128px); padding: clamp(44px, 7vw, 90px) 0 0; }
 .release-description { grid-column: 1; grid-row: 1; max-width: 760px; }
@@ -611,8 +610,7 @@ body.is-leaving main { opacity: 0; transform: translateY(6px); transition: opaci
   .project-page { padding-top: 38px; }
   .release-opening h1 { font-size: clamp(2.45rem, 12vw, 4rem); }
   .release-back-link { min-height: 44px; }
-  .release-primary-media { width: 100%; margin-left: 0; transform: none; }
-  .release-primary-media::after { height: 42px; }
+  .release-primary-media { width: 100vw; margin-left: 50%; transform: translateX(-50%); }
   .release-primary-media img { max-height: none; }
   .release-main { grid-template-columns: 1fr; gap: 28px; padding-top: 42px; }
   .release-facts { position: static; grid-column: 1; grid-row: auto; order: -1; width: 100%; max-width: none; }
