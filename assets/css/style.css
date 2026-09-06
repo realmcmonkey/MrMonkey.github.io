@@ -590,6 +590,7 @@ body.is-leaving main { opacity: 0; transform: translateY(6px); transition: opaci
   .home-merch-feature-inner { grid-template-columns: minmax(0, 1fr) 95px; padding: 30px 22px 0; }
   .home-merch-copy { padding-bottom: 30px; }
   .home-merch-feature img { width: 115px; }
+  .contact-social-route { display: none; }
   .library-page, .youtube-page, .about-journey, .contact-page, .merch-page { padding-top: 78px; }
   .library-opening, .contact-opening { grid-template-columns: 1fr; gap: 17px; padding-bottom: 52px; }
   .library-opening h1, .contact-opening h1 { max-width: 11ch; }
