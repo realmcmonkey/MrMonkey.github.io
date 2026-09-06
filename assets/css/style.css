@@ -186,7 +186,7 @@ h3 { font-size: clamp(1.18rem, 2vw, 1.52rem); }
 .home-reveal-art { display: block; min-height: 310px; background: #020815; overflow: hidden; }
 .home-reveal-art img { width: 100%; height: 100%; object-fit: contain; transition: transform 400ms ease; }
 .home-reveal-feature:hover .home-reveal-art img { transform: scale(1.025); }
-.home-reveal-copy { display: flex; flex-direction: column; align-items: flex-start; min-height: 340px; padding: clamp(28px, 4vw, 48px); border-top: 1px solid var(--line); }
+.home-reveal-copy { display: flex; flex-direction: column; align-items: flex-start; min-height: 0; padding: clamp(28px, 4vw, 48px); border-top: 1px solid var(--line); }
 .announcement-badge { display: inline-flex; margin-bottom: 20px; padding: 0.42rem 0.6rem; border: 1px solid rgba(244, 197, 98, 0.62); color: var(--warning); }
 .home-reveal-copy h2 { margin-bottom: 16px; font-size: clamp(1.8rem, 3.2vw, 3.1rem); }
 .home-reveal-copy > p { margin-bottom: 28px; color: #c7d5df; }
@@ -289,8 +289,9 @@ h3 { font-size: clamp(1.18rem, 2vw, 1.52rem); }
 .split-project-title { display: grid; gap: 8px; }
 .split-project-title > span:first-child { font-size: 1em; }
 .split-project-title > span:last-child { color: var(--cyan-bright); font-size: 0.53em; letter-spacing: -0.025em; }
-.release-primary-media { width: 100%; margin: clamp(22px, 4vw, 40px) 0 0; background: #030914; }
-.release-primary-media img { width: 100%; max-height: min(63vw, 650px); object-fit: contain; }
+.release-primary-media { width: min(calc(100vw - 32px), 1320px); margin: clamp(22px, 4vw, 40px) 50% 0; overflow: hidden; background: #06111f; box-shadow: 0 28px 54px rgba(0, 0, 0, 0.28); transform: translateX(-50%); }
+.release-primary-media::after { display: block; height: clamp(48px, 8vw, 116px); margin-top: -1px; background-image: linear-gradient(to bottom, rgba(6, 11, 22, 0.12), var(--ink) 94%), var(--cover-image); background-position: center bottom; background-repeat: no-repeat; background-size: 100% auto; content: ""; filter: saturate(0.72); mask-image: linear-gradient(to bottom, black, transparent); }
+.release-primary-media img { display: block; width: 100%; max-height: min(56vw, 660px); object-fit: contain; }
 .release-intro { max-width: 790px; margin: clamp(22px, 3vw, 32px) 0 0; color: #c8d5df; font-size: clamp(1rem, 1.5vw, 1.14rem); line-height: 1.74; }
 .release-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(210px, 0.31fr); gap: clamp(40px, 8vw, 128px); padding: clamp(44px, 7vw, 90px) 0 0; }
 .release-description { grid-column: 1; grid-row: 1; max-width: 760px; }
@@ -564,6 +565,7 @@ body.is-leaving main { opacity: 0; transform: translateY(6px); transition: opaci
   .social-link { width: 47px; height: 47px; }
   .social-link img { width: 23px; height: 23px; }
   .home-showcase-grid { grid-template-columns: 1fr; width: var(--content); margin: 34px auto 0; gap: 50px; }
+  .home-experience { padding-bottom: 28px; }
   .home-reveal { width: auto; margin: 0; }
   .home-reveal-heading { padding-bottom: 11px; }
   .home-reveal-heading p:last-child { font-size: 0.72rem; }
@@ -579,7 +581,8 @@ body.is-leaving main { opacity: 0; transform: translateY(6px); transition: opaci
   .featured-projects { grid-template-columns: 1fr; gap: 17px; }
   .featured-projects .project-card:not(:nth-child(-n + 3)) { display: none; }
   .featured-projects .project-card { grid-template-columns: minmax(142px, 53%) minmax(0, 47%); gap: 14px; padding-bottom: 17px; }
-  .featured-projects .project-media { aspect-ratio: 4 / 3; }
+  .featured-projects .project-media { align-self: start; aspect-ratio: auto; background: transparent; }
+  .featured-projects .project-media img { display: block; height: auto; object-fit: initial; }
   .featured-projects .card-body { min-width: 0; min-height: 0; }
   .featured-projects .card-meta { overflow-wrap: anywhere; font-size: 0.61rem; line-height: 1.32; }
   .featured-projects .card-body h3 { font-size: clamp(1rem, 4.5vw, 1.14rem); line-height: 1.1; }
@@ -608,6 +611,8 @@ body.is-leaving main { opacity: 0; transform: translateY(6px); transition: opaci
   .project-page { padding-top: 38px; }
   .release-opening h1 { font-size: clamp(2.45rem, 12vw, 4rem); }
   .release-back-link { min-height: 44px; }
+  .release-primary-media { width: 100%; margin-left: 0; transform: none; }
+  .release-primary-media::after { height: 54px; }
   .release-primary-media img { max-height: none; }
   .release-main { grid-template-columns: 1fr; gap: 28px; padding-top: 42px; }
   .release-facts { position: static; grid-column: 1; grid-row: auto; order: -1; width: 100%; max-width: none; }

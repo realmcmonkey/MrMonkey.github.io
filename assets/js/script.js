@@ -1431,6 +1431,22 @@ const setupImageGalleries = () => {
   });
 };
 
+const setupReleaseCoverArt = () => {
+  document.querySelectorAll(".release-primary-media img").forEach((image) => {
+    const setCoverImage = () => {
+      if (image.currentSrc) {
+        image.parentElement.style.setProperty("--cover-image", `url("${image.currentSrc}")`);
+      }
+    };
+
+    if (image.complete) {
+      setCoverImage();
+    } else {
+      image.addEventListener("load", setCoverImage, { once: true });
+    }
+  });
+};
+
 hydrateSite();
 rewriteStaticInternalLinks();
 setupNavigation();
@@ -1442,5 +1458,6 @@ setupScrollReveals();
 setupAnimatedDetails();
 setupStoryChapters();
 setupImageGalleries();
+setupReleaseCoverArt();
 setupProjectUrlControls();
 setupPageTransitions();
